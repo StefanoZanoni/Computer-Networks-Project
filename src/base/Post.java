@@ -128,7 +128,7 @@ public final class Post {
      * @param numberOfPreviousComments  the number of previous comments that is stored by the server
      * @param age                       the number of times the reward was computed
      * @return the computed reward for this post
-     * <p>
+     *
      * Since a user cannot upvote or downvote two times the same post and
      * upvote and downvote can only assume the value +1 and -1 respectively, the first summation
      * inside the first log is well-defined
