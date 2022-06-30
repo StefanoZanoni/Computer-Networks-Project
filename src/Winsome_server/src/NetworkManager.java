@@ -1,13 +1,13 @@
-import base.Post;
-import base.User;
+import winsome.base.Post;
+import winsome.base.User;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NetworkManager {
 
-    private final ConcurrentHashMap<User, List<User>> network = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<User, List<Post>> blogs = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, List<User>> network = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, List<Post>> blogs = new ConcurrentHashMap<>();
 
 
 }
