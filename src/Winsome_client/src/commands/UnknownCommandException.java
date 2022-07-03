@@ -1,7 +1,7 @@
 package commands;
 
-public class UnknownCommandException extends RuntimeException {
+public class UnknownCommandException extends Exception {
 
-    UnknownCommandException(String e) { super(e); }
+    public UnknownCommandException(String e) { super(e); }
 
 }
