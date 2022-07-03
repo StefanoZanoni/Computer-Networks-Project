@@ -14,13 +14,4 @@ public class ConnectionsManager {
 
     }
 
-    private boolean validatePassword(char[] password) {
-
-        String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(CharBuffer.wrap(password));
-        return matcher.matches();
-
-    }
-
 }
