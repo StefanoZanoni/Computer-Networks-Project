@@ -13,7 +13,7 @@ public class CommandParser {
 
     public void parse() {
 
-        String[] words = scanner.next().split(" ");
+        String[] words = scanner.next().split("(\\w+)|(\".+?\")");
         command = words[0];
         arguments.addAll(Arrays.asList(words).subList(1, words.length));
         if ( command.compareTo("list") == 0 || command.compareTo("show") == 0 ||
