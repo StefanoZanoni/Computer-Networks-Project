@@ -1,4 +1,5 @@
 import commands.CommandParser;
+import commands.UnknownCommandException;
 import winsome.config.ClientConfigurationParser;
 
 import java.io.IOException;
@@ -19,13 +20,19 @@ public class WinsomeClient {
 
         CommandParser commandParser = new CommandParser();
         String command;
+
         do {
 
             commandParser.parse();
             command = commandParser.getCommand();
-            tcpConnectionManager.sendCommand(command, commandParser.getArguments());
+            try {
+                tcpConnectionManager.interact(command, commandParser.getArguments());
+            } catch (UnknownCommandException ignored) {}
 
         } while(command.compareTo("logout") != 0);
+
+        commandParser.close();
+        tcpConnectionManager.close();
 
     }
 }

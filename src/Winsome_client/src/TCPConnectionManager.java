@@ -1,5 +1,7 @@
 import commands.UnknownCommandException;
+import winsome.net.NetError;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -36,7 +38,7 @@ public class TCPConnectionManager {
 
     }
 
-    public void sendCommand(String command, List<String> arguments) throws UnknownCommandException {
+    public void interact(String command, List<String> arguments) throws UnknownCommandException {
 
          class CommandSelector {
 
@@ -91,7 +93,14 @@ public class TCPConnectionManager {
             bufferDim += argumentsDim;
         }
 
-        ByteBuffer buffer = ByteBuffer.allocate(bufferDim);
+        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+        buffer.putInt(bufferDim);
+        try {
+            socketChannel.write(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        buffer = ByteBuffer.allocate(bufferDim);
 
         buffer.put( command.getBytes(StandardCharsets.UTF_8) );
         buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
@@ -113,9 +122,38 @@ public class TCPConnectionManager {
         try {
             socketChannel.write(buffer);
         } catch (IOException e) {
-            throw new RuntimeException("I/O error while sending command to server");
+            throw new RuntimeException(e);
         }
 
+    }
+
+    private void receive() {
+
+        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+        try {
+            socketChannel.read(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        buffer.flip();
+        int bufferDim = buffer.getInt();
+        buffer = ByteBuffer.allocate(bufferDim);
+
+        try {
+            socketChannel.read(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        byte[] rawResult = buffer.array();
+        String result = new String(rawResult, StandardCharsets.UTF_8);
+        String[] parts = result.split("\\|");
+
+        int error = Integer.parseInt(parts[0]);
+        if (error == 1) {
+            String errorType = parts[1];
+            NetError netError = NetError.valueOf(errorType);
+            netError.showError();
+        }
 
     }
 
