@@ -1,6 +1,5 @@
 package winsome.config;
 
-import javax.swing.event.InternalFrameEvent;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -9,43 +8,42 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
-public class ServerConfigurationParser implements ConfigurationParser {
+public class ServerConfigurationParser extends ConfigurationParser {
 
-    String host = "localhost";
-    int tcpPort = 6001;
-    InetAddress multicastIP;
-    int multicastPort = 6002;
-    String rmiCallbackName = "FollowersServerNotification";
-    int rmiCallbackPort = 6003;
-    String registerName = "RegistrationWinsomeServer";
-    int registerPort = 6004;
-    int corePoolSize = 2;
-    int maximumPoolSize = 64;
-    int keepAliveTime = 20000;
-    int taskQueueDimension = 10;
-    int walletUpdateTime = 60;
-    int authorEarnPercentage = 75;
+    int corePoolSize;
+    int maximumPoolSize;
+    int keepAliveTime;
+    int taskQueueDimension;
+    int walletUpdateTime;
+    int authorEarnPercentage;
 
-    Map<String, String> map = new HashMap<>();
-
-    ServerConfigurationParser() {
-
+    protected void setDefault() {
+        host = "localhost";
+        tcpPort = 6001;
         try {
             multicastIP = InetAddress.getByName("239.255.32.32");
         } catch (UnknownHostException e) {
             e.printStackTrace(System.err);
             throw new RuntimeException("default multicast host not found");
         }
-
+        multicastPort = 6002;
+        rmiCallbackName = "FollowersServerNotification";
+        rmiCallbackPort = 6003;
+        registerName = "RegistrationWinsomeServer";
+        registerPort = 6004;
+        corePoolSize = 8;
+        maximumPoolSize = 64;
+        keepAliveTime = 20000;
+        taskQueueDimension = 20;
+        walletUpdateTime = 60;
+        authorEarnPercentage = 75;
     }
 
     @Override
-    public void parseConfiguration(String filename) throws IOException {
+    public void parseConfiguration() throws IOException {
 
-        Path filepath = Paths.get(filename).toAbsolutePath();
+        Path filepath = Paths.get("client.cfg").toAbsolutePath();
 
         try (BufferedReader  fileReader = new BufferedReader(new FileReader(filepath.toFile()))) {
 
@@ -67,15 +65,15 @@ public class ServerConfigurationParser implements ConfigurationParser {
             registerPort = Integer.parseInt(map.get("register_port"));
             corePoolSize = Integer.parseInt(map.get("corePoolSize"));
             maximumPoolSize = Integer.parseInt(map.get("maximumPoolSize"));
-            keepAliveTime = Integer.parseInt(map.get("keepAliceTime"));
+            keepAliveTime = Integer.parseInt(map.get("keepAliveTime"));
             taskQueueDimension = Integer.parseInt(map.get("taskQueueDimension"));
             walletUpdateTime = Integer.parseInt(map.get("walletUpdateTime"));
             authorEarnPercentage = Integer.parseInt(map.get("authorEarnPercentage"));
 
         }
         catch (FileNotFoundException e) {
-            e.printStackTrace(System.err);
-            throw new RuntimeException("server configuration file not found");
+            System.err.println("Configuration file not found. Default settings will be applied");
+            setDefault();
         }
 
     }

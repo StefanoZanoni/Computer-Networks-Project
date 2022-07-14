@@ -1,7 +1,6 @@
 import commands.UnknownCommandException;
 import winsome.net.NetError;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -14,10 +13,10 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TCPConnectionManager {
+public class ClientTCPConnectionManager {
     SocketChannel socketChannel;
 
-    public TCPConnectionManager() {
+    public ClientTCPConnectionManager() {
 
         try {
             socketChannel = SocketChannel.open();

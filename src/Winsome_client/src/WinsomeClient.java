@@ -10,12 +10,12 @@ public class WinsomeClient {
 
         ClientConfigurationParser configurationParser = new ClientConfigurationParser();
         try {
-            configurationParser.parseConfiguration("client.cfg");
+            configurationParser.parseConfiguration();
         } catch (IOException e) {
-            throw new RuntimeException("Error while reading lines from file");
+            throw new RuntimeException("Error while reading lines from configuration file");
         }
 
-        TCPConnectionManager tcpConnectionManager = new TCPConnectionManager();
+        ClientTCPConnectionManager tcpConnectionManager = new ClientTCPConnectionManager();
         tcpConnectionManager.establishConnection(configurationParser.getHost(), configurationParser.getTcpPort());
 
         CommandParser commandParser = new CommandParser();

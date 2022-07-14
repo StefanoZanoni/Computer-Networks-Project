@@ -8,33 +8,31 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ClientConfigurationParser implements ConfigurationParser {
+public class ClientConfigurationParser extends ConfigurationParser {
 
-    String host = "localhost";
-    int tcpPort = 8001;
-    InetAddress multicastIP;
-    int  multicastPort = 8002;
-    String rmiCallbackName = "FollowersServerNotification";
-    int rmiCallbackPort = 8003;
-    String registerName = "RegistrationWinsomeServer";
-    int registerPort = 8004;
     Map<String, String> map = new HashMap<>();
 
-    public ClientConfigurationParser() {
+    protected void setDefault() {
 
+        host = "localhost";
+        tcpPort = 8001;
         try {
             multicastIP = InetAddress.getByName("239.255.32.32");
         } catch (UnknownHostException e) {
             e.printStackTrace(System.err);
             throw new RuntimeException("default multicast host not found");
         }
-
+        multicastPort = 8002;
+        rmiCallbackName = "FollowersServerNotification";
+        rmiCallbackPort = 8003;
+        registerName = "RegistrationWinsomeServer";
+        registerPort = 8004;
     }
 
     @Override
-    public void parseConfiguration(String filename) throws IOException {
+    public void parseConfiguration() throws IOException {
 
-        Path filepath = Paths.get(filename).toAbsolutePath();
+        Path filepath = Paths.get("client.cfg").toAbsolutePath();
 
         try ( BufferedReader fileReader = new BufferedReader(new FileReader(filepath.toFile())) ) {
 
@@ -57,8 +55,8 @@ public class ClientConfigurationParser implements ConfigurationParser {
 
         }
         catch (FileNotFoundException e) {
-            e.printStackTrace(System.err);
-            throw new RuntimeException("configuration file not found");
+            System.err.println("Configuration file not found. Default settings will be applied");
+            setDefault();
         }
 
     }
