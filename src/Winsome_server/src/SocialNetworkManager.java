@@ -6,8 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SocialNetworkManager {
 
-    private final ConcurrentHashMap<Integer, List<User>> network = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, List<Post>> blogs = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
 
 
 }

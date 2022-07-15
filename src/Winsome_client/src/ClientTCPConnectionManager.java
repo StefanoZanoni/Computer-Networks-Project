@@ -77,7 +77,7 @@ public class ClientTCPConnectionManager {
 
         int bufferDim;
         if (arguments.length == 0)
-            bufferDim = command.length();
+            bufferDim = command.length() + Character.BYTES;
         else {
             bufferDim = command.length() + Character.BYTES;
             int argumentsDim = (arguments.length - 1) * Character.BYTES;
@@ -92,20 +92,24 @@ public class ClientTCPConnectionManager {
             bufferDim += argumentsDim;
         }
 
-        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+        if (bufferDim < Integer.BYTES)
+            bufferDim = Integer.BYTES;
+
+        ByteBuffer buffer = ByteBuffer.allocate(bufferDim);
+
         buffer.putInt(bufferDim);
         try {
             socketChannel.write(buffer);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        buffer = ByteBuffer.allocate(bufferDim);
+        buffer.clear();
 
         buffer.put( command.getBytes(StandardCharsets.UTF_8) );
         buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
         for (Object object : arguments) {
             if (object instanceof Integer) {
-                buffer.put( ((Integer) object).byteValue() );
+                buffer.putInt( (Integer) object );
                 buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
             }
             else if (object instanceof String) {
@@ -126,6 +130,7 @@ public class ClientTCPConnectionManager {
 
     }
 
+    // not already complete
     private void receive() {
 
         ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
