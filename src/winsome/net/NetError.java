@@ -6,54 +6,66 @@ public enum NetError {
         @Override
         public void showError() {}
     },
-    USERNAMEALREADYPRESENT(1) {
+    USERNAMEALREADYEXISTS(1) {
         @Override
         public void showError() {
-            System.out.println("Error: the inserted username is already present");
+            System.err.println("Error: the inserted username is already present");
         }
     },
     EMPTYPASSWORD(2){
         @Override
         public void showError() {
-            System.out.println("Error: the password is empty");
+            System.err.println("Error: the password is empty");
         }
     },
     LOGINALREADYDONE(3){
         @Override
         public void showError() {
-            System.out.println("Error: login already done");
+            System.err.println("Error: login already done");
         }
     },
     WRONGPASSWORD(4){
         @Override
         public void showError() {
-            System.out.println("Error: wrong password");
+            System.err.println("Error: wrong password");
         }
     },
     VOTEALREADYASSIGNED(5){
         @Override
         public void showError() {
-            System.out.println("Error: You have already rated this post");
+            System.err.println("Error: You have already rated this post");
         }
     },
     POSTNOTINTHEFEED(6){
         @Override
         public void showError() {
-            System.out.println("Error: You cannot rate a post of a user you not follow");
+            System.err.println("Error: You cannot rate a post of a user you not follow");
         }
     },
     ISTHEAUTHOR(7){
         @Override
         public void showError() {
-            System.out.println("Error: You cannot rate your own post");
+            System.err.println("Error: You cannot rate your own post");
         }
     },
     NOTTHEOWNER(8){
         @Override
         public void showError() {
-            System.out.println("Error: You are not the owner of this post");
+            System.err.println("Error: You are not the owner of this post");
         }
     },
+    USERNAMEDOESNOTEXIST(9) {
+        @Override
+        public void showError() {
+            System.err.println("Error: inserted username does not exist");
+        }
+    },
+    USERALREADYLOGGEDIN(10) {
+        @Override
+        public void showError() {
+            System.err.println("Error: user already logged in");
+        }
+    }
     ;
 
     private final int code;
