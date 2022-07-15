@@ -1,3 +1,7 @@
+import winsome.net.*;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 
@@ -21,6 +25,23 @@ public enum Task implements Runnable {
         @Override
         public void run() {
 
+            SocialNetworkManager.couple(client, username);
+
+            ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+
+            try {
+                SocialNetworkManager.addUser(client, username, password, tags);
+                buffer.putInt( NetError.NONE.getCode() );
+            } catch (UsernameAlreadyExistsException e) {
+                buffer.putInt( NetError.USERNAMEALREADYEXISTS.getCode() );
+            }
+
+            try {
+                client.write(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         }
 
     },
@@ -37,6 +58,25 @@ public enum Task implements Runnable {
 
         @Override
         public void run() {
+
+            ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+
+            try {
+                SocialNetworkManager.checkUser(client, username, password);
+                buffer.putInt( NetError.NONE.getCode() );
+            } catch (UsernameDoesNotExistException e) {
+                buffer.putInt( NetError.USERNAMEDOESNOTEXIST.getCode() );
+            } catch (UserAlreadyLoggedInException e) {
+                buffer.putInt( NetError.USERALREADYLOGGEDIN.getCode() );
+            } catch (WrongPasswordException e) {
+                buffer.putInt( NetError.WRONGPASSWORD.getCode() );
+            }
+
+            try {
+                client.write(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
         }
 
@@ -244,7 +284,8 @@ public enum Task implements Runnable {
     }
     ;
 
-    private SocketChannel client;
+    protected SocketChannel client;
     public abstract void setAttributes(List<String> attributes);
+    public void setClient(SocketChannel client) { this.client = client; }
 
 }

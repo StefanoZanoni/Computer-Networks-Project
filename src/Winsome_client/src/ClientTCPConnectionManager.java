@@ -141,23 +141,46 @@ public class ClientTCPConnectionManager {
         }
         buffer.flip();
         int bufferDim = buffer.getInt();
-        buffer = ByteBuffer.allocate(bufferDim);
+        if (bufferDim > Integer.BYTES) {
+            buffer = ByteBuffer.allocate(bufferDim);
+            try {
+                socketChannel.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            byte[] rawResult = buffer.array();
+            String result = new String(rawResult, StandardCharsets.UTF_8);
+            String[] parts = result.split("\\|");
 
-        try {
-            socketChannel.read(buffer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            int error = Integer.parseInt(parts[0]);
+            if (error == 1) {
+                String errorType = parts[1];
+                NetError netError = NetError.valueOf(errorType);
+                netError.showError();
+                return;
+            }
+            // rest of code, need to analyze received data
         }
-        byte[] rawResult = buffer.array();
-        String result = new String(rawResult, StandardCharsets.UTF_8);
-        String[] parts = result.split("\\|");
+        else {
+            buffer.clear();
+            try {
+                socketChannel.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            byte[] rawResult = buffer.array();
+            String result = new String(rawResult, StandardCharsets.UTF_8);
+            String[] parts = result.split("\\|");
 
-        int error = Integer.parseInt(parts[0]);
-        if (error == 1) {
-            String errorType = parts[1];
-            NetError netError = NetError.valueOf(errorType);
-            netError.showError();
+            int error = Integer.parseInt(parts[0]);
+            if (error == 1) {
+                String errorType = parts[1];
+                NetError netError = NetError.valueOf(errorType);
+                netError.showError();
+            }
+            // everything went fine
         }
+
 
     }
 

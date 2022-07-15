@@ -5,7 +5,6 @@ import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -68,7 +67,7 @@ public class ServerTCPConnectionsManager {
                        readBytes = client.read(clientData);
                     } while (readBytes < requestDim);
 
-                    Task task = createTask(clientData);
+                    Task task = createTask(clientData, client);
                     threadPool.submit(task);
                 }
             } catch (IOException e) {
@@ -84,12 +83,13 @@ public class ServerTCPConnectionsManager {
 
     }
 
-    private Task createTask(ByteBuffer clientData) {
+    private Task createTask(ByteBuffer clientData, SocketChannel client) {
 
         String request = StandardCharsets.UTF_8.decode(clientData).toString();
         String[] list = request.split("\\|");
         String command = list[0].toUpperCase();
         Task task = Task.valueOf(command);
+        task.setClient(client);
         String[] temp;
         // temp is a valid array of String only if the command sent from the client has arguments
         try {
