@@ -1,5 +1,4 @@
 import commands.UnknownCommandException;
-import winsome.net.NetError;
 
 import java.io.IOException;
 import java.net.*;
@@ -75,11 +74,11 @@ public class ClientTCPConnectionManager {
 
     private void send(String command, Object... arguments) {
 
-        int bufferDim;
+        int bufferCapacity;
         if (arguments.length == 0)
-            bufferDim = command.length() + Character.BYTES;
+            bufferCapacity = command.length() + Character.BYTES;
         else {
-            bufferDim = command.length() + Character.BYTES;
+            bufferCapacity = command.length() + Character.BYTES;
             int argumentsDim = (arguments.length - 1) * Character.BYTES;
             for (Object object : arguments) {
                 if (object instanceof Integer)
@@ -89,15 +88,15 @@ public class ClientTCPConnectionManager {
                 else if (object instanceof char[])
                     argumentsDim += ((char[]) object).length;
             }
-            bufferDim += argumentsDim;
+            bufferCapacity += argumentsDim;
         }
 
-        if (bufferDim < Integer.BYTES)
-            bufferDim = Integer.BYTES;
+        if (bufferCapacity < Integer.BYTES)
+            bufferCapacity = Integer.BYTES;
 
-        ByteBuffer buffer = ByteBuffer.allocate(bufferDim);
+        ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
-        buffer.putInt(bufferDim);
+        buffer.putInt(bufferCapacity);
         try {
             socketChannel.write(buffer);
         } catch (IOException e) {
@@ -130,56 +129,8 @@ public class ClientTCPConnectionManager {
 
     }
 
-    // not already complete
     private void receive() {
 
-        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
-        try {
-            socketChannel.read(buffer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        buffer.flip();
-        int bufferDim = buffer.getInt();
-        if (bufferDim > Integer.BYTES) {
-            buffer = ByteBuffer.allocate(bufferDim);
-            try {
-                socketChannel.read(buffer);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            byte[] rawResult = buffer.array();
-            String result = new String(rawResult, StandardCharsets.UTF_8);
-            String[] parts = result.split("\\|");
-
-            int error = Integer.parseInt(parts[0]);
-            if (error == 1) {
-                String errorType = parts[1];
-                NetError netError = NetError.valueOf(errorType);
-                netError.showError();
-                return;
-            }
-            // rest of code, need to analyze received data
-        }
-        else {
-            buffer.clear();
-            try {
-                socketChannel.read(buffer);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            byte[] rawResult = buffer.array();
-            String result = new String(rawResult, StandardCharsets.UTF_8);
-            String[] parts = result.split("\\|");
-
-            int error = Integer.parseInt(parts[0]);
-            if (error == 1) {
-                String errorType = parts[1];
-                NetError netError = NetError.valueOf(errorType);
-                netError.showError();
-            }
-            // everything went fine
-        }
 
 
     }
