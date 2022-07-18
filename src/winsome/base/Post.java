@@ -97,9 +97,7 @@ public final class Post {
         return downvotes;
     }
 
-    public synchronized void addComment(Comment comment) {
-        comments.add(comment);
-    }
+    public synchronized void addComment(Comment comment) { comments.add(comment); }
 
     public List<Comment> getComments() {
         return comments;

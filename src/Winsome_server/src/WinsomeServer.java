@@ -14,12 +14,18 @@ public class WinsomeServer {
             throw new RuntimeException("Error while reading lines from configuration file");
         }
 
+        SocialNetworkManager socialNetworkManager = new SocialNetworkManager();
+
         ExecutorService threadPool = new ThreadPoolExecutor(configurationParser.getCorePoolSize(),
                 configurationParser.getMaximumPoolSize(), configurationParser.getKeepAliveTime(),
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(configurationParser.getTaskQueueDimension()));
 
-        ServerTCPConnectionsManager connectionsManager = new ServerTCPConnectionsManager(threadPool);
+        ServerTCPConnectionsManager tcpConnectionsManager = new ServerTCPConnectionsManager( threadPool,
+                configurationParser.getHost(), configurationParser.getTcpPort() );
 
+        while(true) {
+            tcpConnectionsManager.select();
+        }
     }
 
 }

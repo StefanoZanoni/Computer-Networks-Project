@@ -1,7 +1,6 @@
 package winsome.base;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public final class User {
 
@@ -25,6 +24,9 @@ public final class User {
     public char[] getPassword() { return password; }
     public List<String> getTags() { return tags; }
 
-
+    @Override
+    public String toString() {
+        return "user: " + username + "\ntags: " + tags.toString() + "\nwallet: " + wallet;
+    }
 
 }

@@ -24,6 +24,9 @@ public final class Wallet {
 
         public float getIncrement() { return increment; }
 
+        @Override
+        public String toString() { return "gain: " + increment + timestamp; }
+
     }
 
     private float rewards = 0;
@@ -41,16 +44,6 @@ public final class Wallet {
     public float getRewards() { return rewards; }
 
     @Override
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (!(o instanceof Wallet wallet)) return false;
-        return Float.compare(wallet.getRewards(), getRewards()) == 0
-                && transactionsHistory.equals(wallet.transactionsHistory);
-
-    }
-
-    @Override
-    public int hashCode() { return Objects.hash(getRewards()); }
+    public String toString() { return "rewards: " + rewards + "\ntransactions: " + transactionsHistory; }
 
 }
