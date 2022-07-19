@@ -67,6 +67,14 @@ public enum NetError {
     POSTDOESNOTEXIST(11) {
         @Override
         public void showError() { System.err.println("Error: post does not exist\n"); }
+    },
+    POSTALREADYVOTED(12) {
+        @Override
+        public void showError() { System.err.println("Error: post already voted\n"); }
+    },
+    INVALIDVOTE(13) {
+        @Override
+        public void showError() { System.err.println("Error: the vote is invalid\n"); }
     }
     ;
 
