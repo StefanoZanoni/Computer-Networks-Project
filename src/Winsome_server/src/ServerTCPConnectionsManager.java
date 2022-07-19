@@ -87,18 +87,18 @@ public class ServerTCPConnectionsManager {
 
         String request = StandardCharsets.UTF_8.decode(clientData).toString();
         String[] list = request.split("\\|");
-        String command = list[0].toUpperCase();
+        String command = list[0];
         Task task = Task.valueOf(command);
         task.setClient(client);
-        String[] temp;
+        String[] arguments;
         // temp is a valid array of String only if the command sent from the client has arguments
         try {
-            temp = Arrays.copyOfRange(list, 1, list.length);
+            arguments = Arrays.copyOfRange(list, 1, list.length);
         } catch (ArrayIndexOutOfBoundsException b) {
-            temp = null;
+            arguments = null;
         }
-        if (temp != null)
-            task.setAttributes( Arrays.asList(temp) );
+        if (arguments != null)
+            task.setAttributes( Arrays.asList(arguments) );
 
         return task;
 

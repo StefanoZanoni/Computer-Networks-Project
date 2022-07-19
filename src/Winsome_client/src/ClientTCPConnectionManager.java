@@ -7,6 +7,7 @@ import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -104,20 +105,26 @@ public class ClientTCPConnectionManager {
         }
         buffer.clear();
 
-        buffer.put( command.getBytes(StandardCharsets.UTF_8) );
+        command = command.replaceAll("\\s+", "");
+        buffer.put( command.toUpperCase().getBytes(StandardCharsets.UTF_8) );
         buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
-        for (Object object : arguments) {
+        Iterator<Object> iterator = Arrays.stream(arguments).iterator();
+        while (iterator.hasNext()) {
+            Object object = iterator.next();
             if (object instanceof Integer) {
                 buffer.putInt( (Integer) object );
-                buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
+                if (iterator.hasNext())
+                    buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
             }
             else if (object instanceof String) {
                 buffer.put( ((String) object).getBytes(StandardCharsets.UTF_8) );
-                buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
+                if (iterator.hasNext())
+                    buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
             }
             else if (object instanceof char[]) {
                 buffer.put( Arrays.toString(((char[]) object)).getBytes(StandardCharsets.UTF_8) );
-                buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
+                if (iterator.hasNext())
+                    buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
             }
         }
 
