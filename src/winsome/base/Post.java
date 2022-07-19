@@ -8,7 +8,7 @@ import static java.lang.Math.*;
 
 public final class Post {
 
-    private static class Comment {
+    public static class Comment {
 
         private final String author;
         private final String text;

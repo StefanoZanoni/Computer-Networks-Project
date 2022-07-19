@@ -23,6 +23,7 @@ public final class User {
     public String getUsername() { return username; }
     public char[] getPassword() { return password; }
     public List<String> getTags() { return tags; }
+    public Wallet getWallet() { return wallet; }
 
     @Override
     public String toString() {
