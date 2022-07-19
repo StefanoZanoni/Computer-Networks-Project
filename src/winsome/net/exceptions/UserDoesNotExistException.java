@@ -1,4 +1,4 @@
-package winsome.net;
+package winsome.net.exceptions;
 
 public class UserDoesNotExistException extends Exception {
 

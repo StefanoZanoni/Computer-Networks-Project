@@ -1,10 +1,9 @@
 import winsome.base.Post;
 import winsome.base.User;
 import winsome.base.Wallet;
-import winsome.net.*;
+import winsome.net.exceptions.*;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
 import java.util.*;

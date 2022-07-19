@@ -1,12 +1,11 @@
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import winsome.base.Post;
 import winsome.base.User;
 import winsome.base.Wallet;
 import winsome.net.*;
+import winsome.net.exceptions.*;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
