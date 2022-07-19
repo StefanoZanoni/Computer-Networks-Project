@@ -1,7 +1,11 @@
 import winsome.base.Post;
 import winsome.base.User;
+import winsome.base.Wallet;
 import winsome.net.*;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -216,6 +220,91 @@ public class SocialNetworkManager {
 
         posts.remove(idPost, post);
         postsNetwork.get(username).remove(post);
+
+    }
+
+    public static void rewin(SocketChannel client, int idPost)
+            throws UserNotYetLoggedInException, PostNotInTheFeedException, PostDoesNotExistException {
+
+        List<Post> feed = SocialNetworkManager.getFeed(client);
+        String username = connections.get(client);
+        Post post = posts.get(idPost);
+        if (post == null)
+            throw new PostDoesNotExistException();
+        if (!feed.contains(post))
+            throw new PostNotInTheFeedException();
+
+        postsNetwork.get(username).add(post);
+
+    }
+
+    public static void ratePost(SocketChannel client, int idPost, int vote)
+            throws UserNotYetLoggedInException, PostDoesNotExistException, PostNotInTheFeedException,
+            PostAlreadyVotedException, UserIsTheAuthorException, InvalidVoteException {
+
+        List<Post> feed = SocialNetworkManager.getFeed(client);
+        String username = connections.get(client);
+        Post post = posts.get(idPost);
+        if (post == null)
+            throw new PostDoesNotExistException();
+        if (!feed.contains(post))
+            throw new PostNotInTheFeedException();
+        List<String> upVotes = post.getUpvotes();
+        if (upVotes.contains(username))
+            throw new PostAlreadyVotedException();
+        List<String> downVotes = post.getDownvotes();
+        if (downVotes.contains(username))
+            throw new PostAlreadyVotedException();
+        if (post.getOwner().equals(username))
+            throw new UserIsTheAuthorException();
+        if (vote != 1 && vote != -1)
+            throw new InvalidVoteException();
+
+        if (vote == 1)
+            upVotes.add(username);
+        else
+            downVotes.add(username);
+
+    }
+
+    public static void addComment(SocketChannel client, int idPost, String text)
+            throws UserNotYetLoggedInException, UserIsTheAuthorException, PostNotInTheFeedException {
+
+        List<Post> feed = SocialNetworkManager.getFeed(client);
+        Post post = posts.get(idPost);
+        if (!feed.contains(post))
+            throw new PostNotInTheFeedException();
+        String username = connections.get(client);
+        if (post.getOwner().equals(username))
+            throw new UserIsTheAuthorException();
+
+        post.addComment(new Post.Comment(username, text));
+
+    }
+
+    public static Wallet getWallet(SocketChannel client) throws UserNotYetLoggedInException {
+
+        String username = connections.get(client);
+        if (username == null)
+            throw new UserNotYetLoggedInException();
+        User user = users.get(username);
+
+        return user.getWallet();
+
+    }
+
+    public static Wallet getWalletBTC(SocketChannel client) throws UserNotYetLoggedInException, IOException {
+
+        Wallet wallet = SocialNetworkManager.getWallet(client);
+
+        URL url = new URL("https://www.random.org/decimal-fractions/?num=1&dec=10&col=1&format=plain&rnd=new");
+        Scanner scanner = new Scanner(url.openStream());
+        // exchangeRate is in [0.5, 1.5]
+        float exchangeRate = Float.parseFloat(scanner.next()) + 1;
+        float rewardsBTC = wallet.getRewards() * exchangeRate;
+        wallet.setRewardsBTC(rewardsBTC);
+
+        return wallet;
 
     }
 

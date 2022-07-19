@@ -40,9 +40,8 @@ public final class Wallet {
     }
 
     public List<Transaction> getTransactions() { return transactionsHistory; }
-
     public float getRewards() { return rewards; }
-
+    public void setRewardsBTC(float rewardsBTC) { rewards = rewardsBTC; }
     @Override
     public String toString() { return "rewards: " + rewards + "\ntransactions: " + transactionsHistory; }
 

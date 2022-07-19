@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import winsome.base.Post;
 import winsome.base.User;
+import winsome.base.Wallet;
 import winsome.net.*;
 
 import java.io.IOException;
@@ -519,7 +520,33 @@ public enum Task implements Runnable {
         @Override
         public void run() {
 
+            int bufferCapacity = Integer.BYTES;
+            ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
+            buffer.putInt(Integer.BYTES);
+            try {
+                client.write(buffer);
+                buffer.clear();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                SocialNetworkManager.deletePost(client, idPost);
+                buffer.putInt( NetError.NONE.getCode() );
+            } catch (UserNotYetLoggedInException e) {
+                buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
+            } catch (PostDoesNotExistException e) {
+                buffer.putInt( NetError.POSTDOESNOTEXIST.getCode() );
+            } catch (UserIsNotTheOwnerException e) {
+                buffer.putInt( NetError.NOTTHEOWNER.getCode() );
+            }
+
+            try {
+                client.write(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
         }
 
@@ -528,12 +555,38 @@ public enum Task implements Runnable {
 
         int idPost;
 
-        public void setAttributes(List<String> attributes) {
-            idPost = Integer.parseInt( attributes.get(0) );
-        }
+        public void setAttributes(List<String> attributes) { idPost = Integer.parseInt( attributes.get(0) ); }
 
         @Override
         public void run() {
+
+            int bufferCapacity = Integer.BYTES;
+            ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+
+            buffer.putInt(Integer.BYTES);
+            try {
+                client.write(buffer);
+                buffer.clear();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                SocialNetworkManager.rewin(client, idPost);
+                buffer.putInt( NetError.NONE.getCode() );
+            } catch (UserNotYetLoggedInException e) {
+                buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
+            } catch (PostNotInTheFeedException e) {
+                buffer.putInt( NetError.POSTNOTINTHEFEED.getCode() );
+            } catch (PostDoesNotExistException e) {
+                buffer.putInt(NetError.POSTDOESNOTEXIST.getCode() );
+            }
+
+            try {
+                client.write(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
         }
 
@@ -549,6 +602,40 @@ public enum Task implements Runnable {
 
         @Override
         public void run() {
+
+            int bufferCapacity = Integer.BYTES;
+            ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+
+            buffer.putInt(Integer.BYTES);
+            try {
+                client.write(buffer);
+                buffer.clear();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                SocialNetworkManager.ratePost(client, idPost, vote);
+                buffer.putInt( NetError.NONE.getCode() );
+            } catch (UserNotYetLoggedInException e) {
+                buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
+            } catch (PostDoesNotExistException e) {
+                buffer.putInt( NetError.POSTDOESNOTEXIST.getCode() );
+            } catch (PostNotInTheFeedException e) {
+                buffer.putInt( NetError.POSTNOTINTHEFEED.getCode() );
+            } catch (PostAlreadyVotedException e) {
+                buffer.putInt( NetError.POSTALREADYVOTED.getCode() );
+            } catch (UserIsTheAuthorException e) {
+                buffer.putInt( NetError.ISTHEAUTHOR.getCode() );
+            } catch (InvalidVoteException e) {
+                buffer.putInt( NetError.INVALIDVOTE.getCode() );
+            }
+
+            try {
+                client.write(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
         }
 
@@ -566,6 +653,34 @@ public enum Task implements Runnable {
         @Override
         public void run() {
 
+            int bufferCapacity = Integer.BYTES;
+            ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+
+            buffer.putInt(Integer.BYTES);
+            try {
+                client.write(buffer);
+                buffer.clear();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                SocialNetworkManager.addComment(client, idPost, comment);
+                buffer.putInt( NetError.NONE.getCode() );
+            } catch (UserNotYetLoggedInException e) {
+                buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
+            } catch (UserIsTheAuthorException e) {
+                buffer.putInt( NetError.ISTHEAUTHOR.getCode() );
+            } catch (PostNotInTheFeedException e) {
+                buffer.putInt( NetError.POSTNOTINTHEFEED.getCode() );
+            }
+
+            try {
+                client.write(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         }
     },
     GETWALLET{
@@ -574,6 +689,44 @@ public enum Task implements Runnable {
 
         @Override
         public void run() {
+
+            int bufferCapacity = Integer.BYTES;
+            ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+
+            try {
+
+                Wallet wallet = SocialNetworkManager.getWallet(client);
+                Gson gson = new Gson();
+                String jsonWallet = gson.toJson(wallet);
+                buffer.putInt(Integer.BYTES + Character.BYTES + jsonWallet.length());
+                try {
+                    client.write(buffer);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                bufferCapacity = Integer.BYTES + Character.BYTES + jsonWallet.length();
+                buffer = ByteBuffer.allocate(bufferCapacity);
+                String outcome = NetError.NONE.getCode() + "|" + jsonWallet;
+                buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
+
+            } catch (UserNotYetLoggedInException e) {
+
+                buffer.putInt(Integer.BYTES);
+                try {
+                    client.write(buffer);
+                    buffer.clear();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
+
+            }
+
+            try {
+                client.write(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
         }
 
@@ -584,6 +737,46 @@ public enum Task implements Runnable {
 
         @Override
         public void run() {
+
+            int bufferCapacity = Integer.BYTES;
+            ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+
+            try {
+
+                Wallet wallet = SocialNetworkManager.getWalletBTC(client);
+                Gson gson = new Gson();
+                String jsonWallet = gson.toJson(wallet);
+                buffer.putInt(Integer.BYTES + Character.BYTES + jsonWallet.length());
+                try {
+                    client.write(buffer);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                bufferCapacity = Integer.BYTES + Character.BYTES + jsonWallet.length();
+                buffer = ByteBuffer.allocate(bufferCapacity);
+                String outcome = NetError.NONE.getCode() + "|" + jsonWallet;
+                buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
+
+            } catch (UserNotYetLoggedInException e) {
+
+                buffer.putInt(Integer.BYTES);
+                try {
+                    client.write(buffer);
+                    buffer.clear();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                client.write(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
         }
 
