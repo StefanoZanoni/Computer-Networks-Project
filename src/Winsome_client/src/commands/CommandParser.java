@@ -23,8 +23,6 @@ public class CommandParser {
     }
 
     public String getCommand() { return command; }
-
     public List<String> getArguments() { return arguments; }
-
     public void close() { scanner.close(); }
 }

@@ -19,4 +19,5 @@ public abstract class ConfigurationParser {
 
     public abstract void parseConfiguration() throws IOException;
     protected abstract void setDefault();
+
 }

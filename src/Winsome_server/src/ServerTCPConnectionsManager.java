@@ -51,6 +51,7 @@ public class ServerTCPConnectionsManager {
             iterator.remove();
 
             try {
+
                 if ( key.isAcceptable() ) {
                     SocketChannel client = socketChannel.accept();
                     client.configureBlocking(false);
@@ -70,13 +71,16 @@ public class ServerTCPConnectionsManager {
                     Task task = createTask(clientData, client);
                     threadPool.submit(task);
                 }
+
             } catch (IOException e) {
+
                 key.cancel();
                 try {
                     key.channel().close();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
+
             }
 
         }
@@ -91,7 +95,7 @@ public class ServerTCPConnectionsManager {
         Task task = Task.valueOf(command);
         task.setClient(client);
         String[] arguments;
-        // temp is a valid array of String only if the command sent from the client has arguments
+        // arguments is a valid array of String only if the command sent from the client has arguments
         try {
             arguments = Arrays.copyOfRange(list, 1, list.length);
         } catch (ArrayIndexOutOfBoundsException b) {

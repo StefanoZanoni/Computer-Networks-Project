@@ -9,11 +9,7 @@ public class WinsomeClient {
     public static void main() {
 
         ClientConfigurationParser configurationParser = new ClientConfigurationParser();
-        try {
-            configurationParser.parseConfiguration();
-        } catch (IOException e) {
-            throw new RuntimeException("Error while reading lines from configuration file");
-        }
+        configurationParser.parseConfiguration();
 
         ClientTCPConnectionManager tcpConnectionManager = new ClientTCPConnectionManager();
         tcpConnectionManager.establishConnection(configurationParser.getHost(), configurationParser.getTcpPort());
@@ -25,9 +21,7 @@ public class WinsomeClient {
 
             commandParser.parse();
             command = commandParser.getCommand();
-            try {
-                tcpConnectionManager.interact(command, commandParser.getArguments());
-            } catch (UnknownCommandException ignored) {}
+            tcpConnectionManager.interact(command, commandParser.getArguments());
 
         } while(command.compareTo("logout") != 0);
 

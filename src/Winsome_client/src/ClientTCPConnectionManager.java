@@ -37,13 +37,14 @@ public class ClientTCPConnectionManager {
 
     }
 
-    public void interact(String command, List<String> arguments) throws UnknownCommandException {
+    public void interact(String command, List<String> arguments) {
 
-         class CommandSelector {
+        class CommandSelector {
 
             public void select(String command, List<String> arguments) throws UnknownCommandException {
 
                 switch (command) {
+
                     case "register" -> register(arguments.get(0), arguments.get(1).toCharArray(),
                             arguments.subList(2, arguments.size()));
 
@@ -62,14 +63,17 @@ public class ClientTCPConnectionManager {
                     case "comment" -> send(command, Integer.parseInt(arguments.get(0)), arguments.get(1));
 
                     default -> throw new UnknownCommandException(command + "is not a valid command");
+
                 }
 
             }
 
         }
 
-         CommandSelector commandSelector = new CommandSelector();
-         commandSelector.select(command, arguments);
+        CommandSelector commandSelector = new CommandSelector();
+        try {
+            commandSelector.select(command, arguments);
+        } catch (UnknownCommandException ignored) {}
 
     }
 
@@ -136,19 +140,13 @@ public class ClientTCPConnectionManager {
 
     }
 
-    private void receive() {
-
-
-
-    }
-
     private void register(String username, char[] password, List<String> tags) {
 
         if (username == null || password == null || tags == null)
             throw new NullPointerException();
 
         if (tags.size() > 5) {
-            System.out.println("have been inserted over 5 tags, only the first 5 will be maintain\n");
+            System.out.println("have been inserted over 5 tags, only the first 5 will be maintained\n");
             tags.subList(5, tags.size()).clear();
         }
 

@@ -10,8 +10,6 @@ import java.util.Map;
 
 public class ClientConfigurationParser extends ConfigurationParser {
 
-    Map<String, String> map = new HashMap<>();
-
     protected void setDefault() {
 
         host = "localhost";
@@ -27,10 +25,11 @@ public class ClientConfigurationParser extends ConfigurationParser {
         rmiCallbackPort = 8003;
         registerName = "RegistrationWinsomeServer";
         registerPort = 8004;
+
     }
 
     @Override
-    public void parseConfiguration() throws IOException {
+    public void parseConfiguration() {
 
         Path filepath = Paths.get("client.cfg").toAbsolutePath();
 
@@ -55,7 +54,10 @@ public class ClientConfigurationParser extends ConfigurationParser {
 
         }
         catch (FileNotFoundException e) {
-            System.err.println("Configuration file not found. Default settings will be applied");
+            System.err.println("Configuration file not found. Default settings will be applied\n");
+            setDefault();
+        } catch (IOException e) {
+            System.err.println("Error while reading lines from configuration file. Default settings will be applied\n");
             setDefault();
         }
 

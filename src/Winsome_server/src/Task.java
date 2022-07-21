@@ -17,12 +17,14 @@ public enum Task implements Runnable {
 
         String username;
         char[] password;
-        final List<String> tags = new ArrayList<>();
+        final List<String> tags = new ArrayList<>(5);
 
         @Override
         public final void setAttributes(List<String> attributes) {
+            char[] password = attributes.get(1).toCharArray();
             username = attributes.get(0);
-            password = attributes.get(1).toCharArray().clone();
+            this.password = password.clone();
+            Arrays.fill(password, (char) 0);
             for (int i = 2; i < 7; i++) {
                 tags.add(attributes.get(i));
             }
@@ -59,15 +61,17 @@ public enum Task implements Runnable {
         }
 
     },
-    LOGIN{
+    LOGIN {
 
         String username;
         char[] password;
 
         @Override
         public final void setAttributes(List<String> attributes) {
+            char[] password = attributes.get(1).toCharArray();
             username = attributes.get(0);
-            password = attributes.get(1).toCharArray().clone();
+            this.password = password.clone();
+            Arrays.fill(password, (char) 0);
         }
 
         @Override
@@ -106,7 +110,7 @@ public enum Task implements Runnable {
         }
 
     },
-    LOGOUT{
+    LOGOUT {
 
         String username;
 
@@ -117,8 +121,6 @@ public enum Task implements Runnable {
 
         @Override
         public void run() {
-
-            SocialNetworkManager.uncouple(client, username);
 
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
@@ -131,7 +133,13 @@ public enum Task implements Runnable {
                 throw new RuntimeException(e);
             }
 
-            buffer.putInt( NetError.NONE.getCode() );
+            try {
+                SocialNetworkManager.uncouple(client, username);
+                buffer.putInt( NetError.NONE.getCode() );
+            } catch (UserNotYetLoggedInException e) {
+                buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
+            }
+
             try {
                 client.write(buffer);
             } catch (IOException e) {
@@ -195,7 +203,7 @@ public enum Task implements Runnable {
         }
 
     },
-    LISTFOLLOWING{
+    LISTFOLLOWING {
         @Override
         public void setAttributes(List<String> attributes) {}
 
@@ -243,7 +251,7 @@ public enum Task implements Runnable {
         }
 
     },
-    FOLLOWUSER{
+    FOLLOW {
 
         String idUser;
 
@@ -282,7 +290,7 @@ public enum Task implements Runnable {
         }
 
     },
-    UNFOLLOWUSER{
+    UNFOLLOW {
 
         String idUser;
 
@@ -320,7 +328,7 @@ public enum Task implements Runnable {
         }
 
     },
-    VIEWBLOG{
+    BLOG {
 
         public void setAttributes(List<String> attributes) {}
 
@@ -368,7 +376,7 @@ public enum Task implements Runnable {
         }
 
     },
-    CREATEPOST {
+    POST {
 
         String title, content;
 
@@ -407,7 +415,7 @@ public enum Task implements Runnable {
         }
 
     },
-    SHOWFEED{
+    SHOWFEED {
 
         public void setAttributes(List<String> attributes) {}
 
@@ -455,7 +463,7 @@ public enum Task implements Runnable {
         }
 
     },
-    SHOWPOST{
+    SHOWPOST {
 
         int idPost;
 
@@ -508,7 +516,7 @@ public enum Task implements Runnable {
         }
 
     },
-    DELETEPOST{
+    DELETE {
 
         int idPost;
 
@@ -550,7 +558,7 @@ public enum Task implements Runnable {
         }
 
     },
-    REWINPOST{
+    REWIN {
 
         int idPost;
 
@@ -590,7 +598,7 @@ public enum Task implements Runnable {
         }
 
     },
-    RATEPOST{
+    RATE {
 
         int idPost, vote;
 
@@ -639,7 +647,7 @@ public enum Task implements Runnable {
         }
 
     },
-    ADDCOMMENT{
+    COMMENT {
 
         int idPost;
         String comment;
@@ -682,7 +690,7 @@ public enum Task implements Runnable {
 
         }
     },
-    GETWALLET{
+    WALLET {
 
         public void setAttributes(List<String> attributes) {}
 
@@ -730,7 +738,7 @@ public enum Task implements Runnable {
         }
 
     },
-    GETWALLETBITCOIN{
+    WALLETBTC{
 
         public void setAttributes(List<String> attributes) {}
 

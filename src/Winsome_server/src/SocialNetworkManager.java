@@ -30,7 +30,14 @@ public class SocialNetworkManager {
     static ConcurrentHashMap<Integer, Post> posts = new ConcurrentHashMap<>();
 
     public static void couple(SocketChannel client, String username) { connections.put(client, username); }
-    public static void uncouple(SocketChannel client, String username) { connections.remove(client, username); }
+    public static void uncouple(SocketChannel client, String username) throws UserNotYetLoggedInException {
+
+        if (!connections.containsKey(client))
+            throw new UserNotYetLoggedInException();
+
+        connections.remove(client, username);
+
+    }
 
     //complete with json
     public static void addUser(SocketChannel client, String username, char[] password, List<String> tags) throws UsernameAlreadyExistsException {
@@ -58,14 +65,13 @@ public class SocialNetworkManager {
     public static void checkUser(SocketChannel client, String username, char[] password)
             throws UserDoesNotExistException, UserAlreadyLoggedInException, WrongPasswordException {
 
+        if (connections.containsValue(username))
+            throw new UserAlreadyLoggedInException();
+        if (!users.containsKey(username))
+            throw new UserDoesNotExistException();
         if ( !Arrays.equals(users.get(username).getPassword(), password) )
             throw new WrongPasswordException();
         Arrays.fill(password, (char) 0);
-
-        if (!users.containsKey(username))
-            throw new UserDoesNotExistException();
-        if (connections.containsValue(username))
-            throw new UserAlreadyLoggedInException();
 
         connections.put(client, username);
 
@@ -84,12 +90,14 @@ public class SocialNetworkManager {
         for (String tag : userTags) {
             List<User> temp = tagsNetwork.get(tag);
             int indexOfCurrentUser = temp.indexOf(user);
-            List<User> temp1 = temp.subList(0, indexOfCurrentUser);
-            List<User> temp2 = temp.subList(indexOfCurrentUser + 1, temp.size());
-            if (temp1.isEmpty() && temp2.isEmpty())
-                continue;
-            likeMindedUsers.addAll(temp1);
-            likeMindedUsers.addAll(temp2);
+            if (indexOfCurrentUser != -1) {
+                List<User> temp1 = temp.subList(0, indexOfCurrentUser);
+                List<User> temp2 = temp.subList(indexOfCurrentUser, temp.size());
+                if (!temp1.isEmpty())
+                    likeMindedUsers.addAll(temp1);
+                if (!temp2.isEmpty())
+                    likeMindedUsers.addAll(temp2);
+            }
         }
 
         if (likeMindedUsers.isEmpty())
@@ -185,7 +193,11 @@ public class SocialNetworkManager {
             return Collections.emptyList();
         List<Post> posts1 = new LinkedList<>();
         for (User user : followed) {
-            posts1.addAll( postsNetwork.get(user.getUsername()) );
+            List<Post> userPosts = postsNetwork.get(user.getUsername());
+            for (Post post : userPosts) {
+                if (!posts1.contains(post))
+                    posts1.add(post);
+            }
         }
         if (posts1.isEmpty())
             return Collections.emptyList();
@@ -274,7 +286,7 @@ public class SocialNetworkManager {
         if (!feed.contains(post))
             throw new PostNotInTheFeedException();
         String username = connections.get(client);
-        if (post.getOwner().equals(username))
+        if (post.getOwner().compareTo(username) == 0)
             throw new UserIsTheAuthorException();
 
         post.addComment(new Post.Comment(username, text));
@@ -306,6 +318,5 @@ public class SocialNetworkManager {
         return wallet;
 
     }
-
 
 }

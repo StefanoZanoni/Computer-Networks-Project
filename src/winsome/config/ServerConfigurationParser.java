@@ -11,12 +11,12 @@ import java.nio.file.Paths;
 
 public class ServerConfigurationParser extends ConfigurationParser {
 
-    int corePoolSize;
-    int maximumPoolSize;
-    int keepAliveTime;
-    int taskQueueDimension;
-    int walletUpdateTime;
-    int authorEarnPercentage;
+    private int corePoolSize;
+    private int maximumPoolSize;
+    private int keepAliveTime;
+    private int taskQueueDimension;
+    private int walletUpdateTime;
+    private int authorEarnPercentage;
 
     protected void setDefault() {
         host = "localhost";
@@ -41,19 +41,26 @@ public class ServerConfigurationParser extends ConfigurationParser {
     }
 
     @Override
-    public void parseConfiguration() throws IOException {
+    public void parseConfiguration() {
 
         Path filepath = Paths.get("client.cfg").toAbsolutePath();
 
         try (BufferedReader  fileReader = new BufferedReader(new FileReader(filepath.toFile()))) {
 
             String line;
-            while ((line = fileReader.readLine()) != null) {
+            while (true) {
+
+                try {
+                    if ((line = fileReader.readLine()) == null) break;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 line = line.trim();
                 if (!line.isEmpty() && !line.startsWith("#")) {
                     String[] words = line.split("=", 2);
                     map.putIfAbsent(words[0], words[1]);
                 }
+
             }
             host = map.get("host");
             tcpPort = Integer.parseInt(map.get("tcp_port"));
@@ -73,6 +80,11 @@ public class ServerConfigurationParser extends ConfigurationParser {
         }
         catch (FileNotFoundException e) {
             System.err.println("Configuration file not found. Default settings will be applied");
+            setDefault();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("multicast address not found");
+        } catch (IOException e) {
+            System.err.println("Error while reading lines from configuration file");
             setDefault();
         }
 
