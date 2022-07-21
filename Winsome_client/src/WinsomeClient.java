@@ -1,8 +1,5 @@
 import commands.CommandParser;
-import commands.UnknownCommandException;
 import winsome.config.ClientConfigurationParser;
-
-import java.io.IOException;
 
 public class WinsomeClient {
 

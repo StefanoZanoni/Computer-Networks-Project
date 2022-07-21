@@ -1,6 +1,5 @@
 import winsome.config.ServerConfigurationParser;
 
-import java.io.IOException;
 import java.util.concurrent.*;
 
 public class WinsomeServer {
