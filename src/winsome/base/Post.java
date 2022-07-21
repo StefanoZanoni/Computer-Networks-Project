@@ -34,6 +34,10 @@ public final class Post {
             return timestamp;
         }
 
+        public String toString() {
+            return timestamp + author + ": " + text + "\n";
+        }
+
     }
 
     private final AtomicInteger ID = new AtomicInteger(0);
@@ -103,21 +107,11 @@ public final class Post {
         return comments;
     }
 
-    @Override
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (!(o instanceof Post post)) return false;
-        return Objects.equals(getID(), post.getID()) && getOwner().equals(post.getOwner())
-                && getTitle().equals(post.getTitle()) && getContent().equals(post.getContent())
-                && getShares().equals(post.getShares()) && getUpvotes().equals(post.getUpvotes())
-                && getDownvotes().equals(post.getDownvotes()) && getComments().equals(post.getComments());
-
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getID(), getOwner(), getTitle(), getContent());
+    public String toString() {
+        return "Title: " + title + "\n"
+                + "Content: " + content + "\n"
+                + "vote: " + upvotes + "positive" + ", " +  downvotes + "negative"
+                + comments;
     }
 
     /**

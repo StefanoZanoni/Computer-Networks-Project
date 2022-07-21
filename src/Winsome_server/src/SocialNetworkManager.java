@@ -18,13 +18,13 @@ public class SocialNetworkManager {
     static ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
 
     // tag -> list users: for each tag this hashmap stores the list of users having that tag
-    static ConcurrentHashMap<String, List<User>> tagsNetwork = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<String, List<String>> tagsNetwork = new ConcurrentHashMap<>();
 
     // user -> followed
-    static ConcurrentHashMap<String, List<User>> usersNetwork = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<String, List<String>> usersNetwork = new ConcurrentHashMap<>();
 
     // user -> posts
-    static ConcurrentHashMap<String, List<Post>> postsNetwork = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<String, List<Integer>> postsNetwork = new ConcurrentHashMap<>();
 
     // id -> post
     static ConcurrentHashMap<Integer, Post> posts = new ConcurrentHashMap<>();
@@ -53,10 +53,10 @@ public class SocialNetworkManager {
         postsNetwork.put(username, new LinkedList<>());
         for (String tag : tags) {
             if (tagsNetwork.containsKey(tag))
-                tagsNetwork.get(tag).add(user);
+                tagsNetwork.get(tag).add(username);
             else {
                 tagsNetwork.put(tag, new LinkedList<>());
-                tagsNetwork.get(tag).add(user);
+                tagsNetwork.get(tag).add(username);
             }
         }
 
@@ -88,7 +88,12 @@ public class SocialNetworkManager {
         List<User> likeMindedUsers = new LinkedList<>();
 
         for (String tag : userTags) {
-            List<User> temp = tagsNetwork.get(tag);
+            List<String> usernames = tagsNetwork.get(tag);
+            List<User> temp = new LinkedList<>();
+            for (String tempUsername : usernames) {
+                User tempUser = users.get(tempUsername);
+                temp.add(tempUser);
+            }
             int indexOfCurrentUser = temp.indexOf(user);
             if (indexOfCurrentUser != -1) {
                 List<User> temp1 = temp.subList(0, indexOfCurrentUser);
@@ -113,7 +118,12 @@ public class SocialNetworkManager {
         if (username == null)
             throw new UserNotYetLoggedInException();
 
-        List<User> followed = usersNetwork.get(username);
+        List<String> usernames = usersNetwork.get(username);
+        List<User> followed = new LinkedList<>();
+        for (String tempUsername : usernames) {
+            User user = users.get(tempUsername);
+            followed.add(user);
+        }
         if (followed.isEmpty())
             return Collections.emptyList();
 
@@ -129,12 +139,11 @@ public class SocialNetworkManager {
             throw new UserNotYetLoggedInException();
 
         if (!user.equals(username)) {
-            User newFollowed = users.get(username);
-            if (newFollowed == null)
+            if (!users.containsKey(username))
                 throw new UserDoesNotExistException();
-            List<User> followed = usersNetwork.get(user);
-            if (!followed.contains(newFollowed))
-                followed.add(newFollowed);
+            List<String> followed = usersNetwork.get(user);
+            if (!followed.contains(username))
+                followed.add(username);
         }
 
     }
@@ -143,14 +152,13 @@ public class SocialNetworkManager {
             throws UserNotYetLoggedInException, UserDoesNotExistException {
 
         String user = connections.get(client);
-        if (username == null)
+        if (user == null)
             throw new UserNotYetLoggedInException();
 
-        User oldFollowed = users.get(username);
-        if (oldFollowed == null)
+        if (!users.containsKey(username))
             throw new UserDoesNotExistException();
 
-        usersNetwork.get(user).remove(oldFollowed);
+        usersNetwork.get(user).remove(username);
 
     }
 
@@ -160,12 +168,17 @@ public class SocialNetworkManager {
         if (username == null)
             throw new UserNotYetLoggedInException();
 
-        List<Post> posts1 = postsNetwork.get(username);
+        List<Integer> ids = postsNetwork.get(username);
+        List<Post> tempPosts = new LinkedList<>();
+        for (Integer id : ids) {
+            Post post = posts.get(id);
+            tempPosts.add(post);
+        }
 
-        if (posts1.isEmpty())
+        if (tempPosts.isEmpty())
             return Collections.emptyList();
 
-        return posts1;
+        return tempPosts;
 
     }
 
@@ -177,7 +190,7 @@ public class SocialNetworkManager {
 
         Post newPost = new Post(username, title, content);
         posts.put(newPost.getID(), newPost);
-        postsNetwork.get(username).add(newPost);
+        postsNetwork.get(username).add(newPost.getID());
 
     }
 
@@ -187,22 +200,27 @@ public class SocialNetworkManager {
         if (username == null)
             throw new UserNotYetLoggedInException();
 
-        List<User> followed = usersNetwork.get(username);
+        List<String> followed = usersNetwork.get(username);
 
         if (followed.isEmpty())
             return Collections.emptyList();
-        List<Post> posts1 = new LinkedList<>();
-        for (User user : followed) {
-            List<Post> userPosts = postsNetwork.get(user.getUsername());
+        List<Post> tempPosts = new LinkedList<>();
+        for (String tempUsername : followed) {
+            List<Integer> ids = postsNetwork.get(tempUsername);
+            List<Post> userPosts = new LinkedList<>();
+            for (Integer id : ids) {
+                Post post = posts.get(id);
+                userPosts.add(post);
+            }
             for (Post post : userPosts) {
-                if (!posts1.contains(post))
-                    posts1.add(post);
+                if (!tempPosts.contains(post))
+                    tempPosts.add(post);
             }
         }
-        if (posts1.isEmpty())
+        if (tempPosts.isEmpty())
             return Collections.emptyList();
 
-        return posts1;
+        return tempPosts;
 
     }
 
@@ -230,7 +248,7 @@ public class SocialNetworkManager {
             throw new UserIsNotTheOwnerException();
 
         posts.remove(idPost, post);
-        postsNetwork.get(username).remove(post);
+        postsNetwork.get(username).remove(idPost);
 
     }
 
@@ -239,13 +257,12 @@ public class SocialNetworkManager {
 
         List<Post> feed = SocialNetworkManager.getFeed(client);
         String username = connections.get(client);
-        Post post = posts.get(idPost);
-        if (post == null)
+        if (!posts.containsKey(idPost))
             throw new PostDoesNotExistException();
-        if (!feed.contains(post))
+        if (!feed.contains(posts.get(idPost)))
             throw new PostNotInTheFeedException();
 
-        postsNetwork.get(username).add(post);
+        postsNetwork.get(username).add(idPost);
 
     }
 

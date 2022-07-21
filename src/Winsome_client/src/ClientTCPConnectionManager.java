@@ -1,6 +1,12 @@
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import commands.UnknownCommandException;
+import winsome.base.Post;
+import winsome.base.Wallet;
+import winsome.net.NetError;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -45,22 +51,58 @@ public class ClientTCPConnectionManager {
 
                 switch (command) {
 
-                    case "register" -> register(arguments.get(0), arguments.get(1).toCharArray(),
-                            arguments.subList(2, arguments.size()));
+                    case "register" -> {
+                        register(arguments.get(0), arguments.get(1).toCharArray(),
+                                arguments.subList(2, arguments.size()));
+                        receive();
+                    }
 
-                    case "login", "post" -> send(command, arguments.get(0), arguments.get(1));
+                    case "login", "post" -> {
+                        send(command, arguments.get(0), arguments.get(1));
+                        receive();
+                    }
 
-                    case "logout" -> send(command, arguments.get(0));
+                    case "logout" -> {
+                        send(command, arguments.get(0));
+                        receive();
+                    }
 
-                    case "list users", "list followers", "list following",
-                            "blog", "show feed", "wallet", "wallet btc" -> send(command);
+                    case "list users", "list following" -> {
+                        send(command);
+                        receiveUsers();
+                    }
 
-                    case "follow", "unfollow", "show post",
-                            "delete", "rewin" -> send(command, Integer.parseInt(arguments.get(0)));
+                    case "list followers" -> {}
 
-                    case "rate" -> send(command, Integer.parseInt(arguments.get(0)), Integer.parseInt(arguments.get(1)));
+                    case "blog", "show feed" -> {
+                        send(command);
+                        receivePosts();
+                    }
 
-                    case "comment" -> send(command, Integer.parseInt(arguments.get(0)), arguments.get(1));
+                    case "wallet", "wallet btc" -> {
+                        send(command);
+                        receiveWallet();
+                    }
+
+                    case "follow", "unfollow", "delete", "rewin" -> {
+                        send(command, Integer.parseInt(arguments.get(0)));
+                        receive();
+                    }
+
+                    case "show post" -> {
+                        send(command, Integer.parseInt(arguments.get(0)));
+                        receivePost();
+                    }
+
+                    case "rate" -> {
+                        send(command, Integer.parseInt(arguments.get(0)), Integer.parseInt(arguments.get(1)));
+                        receive();
+                    }
+
+                    case "comment" -> {
+                        send(command, Integer.parseInt(arguments.get(0)), arguments.get(1));
+                        receive();
+                    }
 
                     default -> throw new UnknownCommandException(command + "is not a valid command");
 
@@ -136,6 +178,191 @@ public class ClientTCPConnectionManager {
             socketChannel.write(buffer);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+    }
+
+    public void receive() {
+
+        int bufferCapacity = Integer.BYTES;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+        try {
+            socketChannel.read(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        NetError error = NetError.valueOf(String.valueOf(buffer.getInt()));
+        error.showError();
+
+    }
+
+    public void receiveUsers() {
+
+        int bufferCapacity = Integer.BYTES;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+        try {
+            socketChannel.read(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        bufferCapacity = buffer.getInt();
+        if (bufferCapacity == Integer.BYTES) {
+
+            buffer.clear();
+            try {
+                socketChannel.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NetError error = NetError.valueOf(String.valueOf(buffer.getInt()));
+            error.showError();
+
+        }
+        else {
+
+            buffer = ByteBuffer.allocate(bufferCapacity);
+            try {
+                socketChannel.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
+            String[] data = outcome.split("\\|");
+            Gson gson = new Gson();
+            Type listOfString = new TypeToken<List<String>>() {}.getType();
+
+            System.out.printf("%s %-1c %s\n", "User", ':', "Tags");
+            System.out.println("---------------------------");
+            for (int i = 0; i < data.length; i = i + 2) {
+                String username = data[i];
+                List<String> tags = gson.fromJson(data[i + 1], listOfString);
+                System.out.println(username + ": " + tags);
+            }
+
+        }
+
+    }
+
+    public void receivePosts() {
+
+        int bufferCapacity = Integer.BYTES;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+        try {
+            socketChannel.read(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        bufferCapacity = buffer.getInt();
+        if (bufferCapacity == Integer.BYTES) {
+
+            buffer.clear();
+            try {
+                socketChannel.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NetError error = NetError.valueOf(String.valueOf(buffer.getInt()));
+            error.showError();
+
+        }
+        else {
+
+            buffer = ByteBuffer.allocate(bufferCapacity);
+            try {
+                socketChannel.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
+            String[] data = outcome.split("\\|");
+
+            System.out.printf("%s %s %s\n", "ID", "Author", "Title");
+            System.out.println("-------------------------------------------");
+            for (int i = 0; i < data.length; i = i + 3) {
+                int id = Integer.parseInt(data[i]);
+                String owner = data[i+1];
+                String title = data[i+2];
+                System.out.println(id + owner + title);
+            }
+
+        }
+
+    }
+
+    public void receivePost() {
+
+        int bufferCapacity = Integer.BYTES;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+        try {
+            socketChannel.read(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        bufferCapacity = buffer.getInt();
+        if (bufferCapacity == Integer.BYTES) {
+
+            buffer.clear();
+            try {
+                socketChannel.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NetError error = NetError.valueOf(String.valueOf(buffer.getInt()));
+            error.showError();
+
+        }
+        else {
+
+            buffer = ByteBuffer.allocate(bufferCapacity);
+            try {
+                socketChannel.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
+            Gson gson = new Gson();
+            Post post = gson.fromJson(outcome, Post.class);
+            System.out.println(post);
+
+        }
+
+    }
+
+    public void receiveWallet() {
+
+        int bufferCapacity = Integer.BYTES;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+        try {
+            socketChannel.read(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        bufferCapacity = buffer.getInt();
+        if (bufferCapacity == Integer.BYTES) {
+
+            buffer.clear();
+            try {
+                socketChannel.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NetError error = NetError.valueOf(String.valueOf(buffer.getInt()));
+            error.showError();
+
+        }
+        else {
+
+            buffer = ByteBuffer.allocate(bufferCapacity);
+            try {
+                socketChannel.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
+            Gson gson = new Gson();
+            Wallet wallet = gson.fromJson(outcome, Wallet.class);
+            System.out.println(wallet);
+
         }
 
     }

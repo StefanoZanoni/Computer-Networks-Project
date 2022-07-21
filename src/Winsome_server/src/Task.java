@@ -36,14 +36,6 @@ public enum Task implements Runnable {
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
-            buffer.putInt(Integer.BYTES);
-            try {
-                client.write(buffer);
-                buffer.clear();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
             try {
                 SocialNetworkManager.addUser(client, username, password, tags);
                 buffer.putInt( NetError.NONE.getCode() );
@@ -82,14 +74,6 @@ public enum Task implements Runnable {
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
-            buffer.putInt(Integer.BYTES);
-            try {
-                client.write(buffer);
-                buffer.clear();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
             try {
                 SocialNetworkManager.checkUser(client, username, password);
                 buffer.putInt( NetError.NONE.getCode() );
@@ -124,14 +108,6 @@ public enum Task implements Runnable {
 
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-
-            buffer.putInt(Integer.BYTES);
-            try {
-                client.write(buffer);
-                buffer.clear();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
 
             try {
                 SocialNetworkManager.uncouple(client, username);
@@ -168,17 +144,24 @@ public enum Task implements Runnable {
             try {
 
                 List<User> userList = SocialNetworkManager.getLikeMindedUsers(client);
+                String outcome = "";
                 Gson gson = new Gson();
-                String jsonUserList = gson.toJson(userList);
-                buffer.putInt(Integer.BYTES + Character.BYTES + jsonUserList.length());
+                Iterator<User> iterator = userList.listIterator();
+                while (iterator.hasNext()) {
+                    User user = iterator.next();
+                    String jsonUserTags = gson.toJson(user.getTags());
+                    if (iterator.hasNext())
+                        outcome = outcome.concat(user.getUsername() + "|" + jsonUserTags + "|");
+                    else
+                        outcome = outcome.concat(user.getUsername() + "|" + jsonUserTags);
+                }
+                buffer.putInt(outcome.length());
                 try {
                     client.write(buffer);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                bufferCapacity = Integer.BYTES + Character.BYTES + jsonUserList.length();
-                buffer = ByteBuffer.allocate(bufferCapacity);
-                String outcome = NetError.NONE.getCode() + "|" + jsonUserList;
+                buffer = ByteBuffer.allocate(outcome.length());
                 buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
 
             } catch (UserNotYetLoggedInException e) {
@@ -216,17 +199,24 @@ public enum Task implements Runnable {
             try {
 
                 List<User> userList = SocialNetworkManager.getFollowed(client);
+                String outcome = "";
                 Gson gson = new Gson();
-                String jsonUserList = gson.toJson(userList);
-                buffer.putInt(Integer.BYTES + Character.BYTES + jsonUserList.length());
+                Iterator<User> iterator = userList.listIterator();
+                while (iterator.hasNext()) {
+                    User user = iterator.next();
+                    String jsonUserTags = gson.toJson(user.getTags());
+                    if (iterator.hasNext())
+                        outcome = outcome.concat(user.getUsername() + "|" + jsonUserTags + "|");
+                    else
+                        outcome = outcome.concat(user.getUsername() + "|" + jsonUserTags);
+                }
+                buffer.putInt(outcome.length());
                 try {
                     client.write(buffer);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                String outcome = NetError.NONE.getCode() + "|" + jsonUserList;
-                bufferCapacity = jsonUserList.length();
-                buffer = ByteBuffer.allocate(bufferCapacity);
+                buffer = ByteBuffer.allocate(outcome.length());
                 buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
 
             } catch (UserNotYetLoggedInException e) {
@@ -264,14 +254,6 @@ public enum Task implements Runnable {
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
-            buffer.putInt(Integer.BYTES);
-            try {
-                client.write(buffer);
-                buffer.clear();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
             try {
                 SocialNetworkManager.addFollowing(client, idUser);
                 buffer.putInt( NetError.NONE.getCode() );
@@ -301,14 +283,6 @@ public enum Task implements Runnable {
 
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-
-            buffer.putInt(Integer.BYTES);
-            try {
-                client.write(buffer);
-                buffer.clear();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
 
             try {
                 SocialNetworkManager.removeFollowing(client, idUser);
@@ -341,17 +315,22 @@ public enum Task implements Runnable {
             try {
 
                 List<Post> userPosts = SocialNetworkManager.getPosts(client);
-                Gson gson = new Gson();
-                String jsonUserPosts = gson.toJson(userPosts);
-                buffer.putInt(Integer.BYTES + Character.BYTES + jsonUserPosts.length());
+                Iterator<Post> iterator = userPosts.listIterator();
+                String outcome = "";
+                while (iterator.hasNext()) {
+                    Post post = iterator.next();
+                    if (iterator.hasNext())
+                        outcome = outcome.concat(post.getID() + "|" + post.getOwner() + "|" + post.getTitle() + "|");
+                    else
+                        outcome = outcome.concat(post.getID() + "|" + post.getOwner() + "|" + post.getTitle());
+                }
+                buffer.putInt(outcome.length());
                 try {
                     client.write(buffer);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                bufferCapacity = Integer.BYTES + Character.BYTES + jsonUserPosts.length();
-                buffer = ByteBuffer.allocate(bufferCapacity);
-                String outcome = NetError.NONE.getCode() + "|" + jsonUserPosts;
+                buffer = ByteBuffer.allocate(outcome.length());
                 buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
 
             } catch (UserNotYetLoggedInException e) {
@@ -391,14 +370,6 @@ public enum Task implements Runnable {
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
-            buffer.putInt(Integer.BYTES);
-            try {
-                client.write(buffer);
-                buffer.clear();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
             try {
                 SocialNetworkManager.addPost(client, title, content);
                 buffer.putInt( NetError.NONE.getCode() );
@@ -428,17 +399,22 @@ public enum Task implements Runnable {
             try {
 
                 List<Post> userPosts = SocialNetworkManager.getFeed(client);
-                Gson gson = new Gson();
-                String jsonUserPosts = gson.toJson(userPosts);
-                buffer.putInt(Integer.BYTES + Character.BYTES + jsonUserPosts.length());
+                Iterator<Post> iterator = userPosts.listIterator();
+                String outcome = "";
+                while (iterator.hasNext()) {
+                    Post post = iterator.next();
+                    if (iterator.hasNext())
+                        outcome = outcome.concat(post.getID() + "|" + post.getOwner() + "|" + post.getTitle() + "|");
+                    else
+                        outcome = outcome.concat(post.getID() + "|" + post.getOwner() + "|" + post.getTitle());
+                }
+                buffer.putInt(outcome.length());
                 try {
                     client.write(buffer);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                bufferCapacity = Integer.BYTES + Character.BYTES + jsonUserPosts.length();
-                buffer = ByteBuffer.allocate(bufferCapacity);
-                String outcome = NetError.NONE.getCode() + "|" + jsonUserPosts;
+                buffer = ByteBuffer.allocate(outcome.length());
                 buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
 
             } catch (UserNotYetLoggedInException e) {
@@ -482,16 +458,14 @@ public enum Task implements Runnable {
                 Post post = SocialNetworkManager.getPost(idPost);
                 Gson gson = new Gson();
                 String jsonPost = gson.toJson(post);
-                buffer.putInt(Integer.BYTES + Character.BYTES + jsonPost.length());
+                buffer.putInt(jsonPost.length());
                 try {
                     client.write(buffer);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                bufferCapacity = Integer.BYTES + Character.BYTES + jsonPost.length();
-                buffer = ByteBuffer.allocate(bufferCapacity);
-                String outcome = NetError.NONE.getCode() + "|" + jsonPost;
-                buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
+                buffer = ByteBuffer.allocate(jsonPost.length());
+                buffer.put(jsonPost.getBytes(StandardCharsets.UTF_8));
 
             } catch (PostDoesNotExistException e) {
 
@@ -530,14 +504,6 @@ public enum Task implements Runnable {
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
-            buffer.putInt(Integer.BYTES);
-            try {
-                client.write(buffer);
-                buffer.clear();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
             try {
                 SocialNetworkManager.deletePost(client, idPost);
                 buffer.putInt( NetError.NONE.getCode() );
@@ -569,14 +535,6 @@ public enum Task implements Runnable {
 
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-
-            buffer.putInt(Integer.BYTES);
-            try {
-                client.write(buffer);
-                buffer.clear();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
 
             try {
                 SocialNetworkManager.rewin(client, idPost);
@@ -612,14 +570,6 @@ public enum Task implements Runnable {
 
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-
-            buffer.putInt(Integer.BYTES);
-            try {
-                client.write(buffer);
-                buffer.clear();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
 
             try {
                 SocialNetworkManager.ratePost(client, idPost, vote);
@@ -663,14 +613,6 @@ public enum Task implements Runnable {
             int bufferCapacity = Integer.BYTES;
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
-            buffer.putInt(Integer.BYTES);
-            try {
-                client.write(buffer);
-                buffer.clear();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
             try {
                 SocialNetworkManager.addComment(client, idPost, comment);
                 buffer.putInt( NetError.NONE.getCode() );
@@ -705,16 +647,14 @@ public enum Task implements Runnable {
                 Wallet wallet = SocialNetworkManager.getWallet(client);
                 Gson gson = new Gson();
                 String jsonWallet = gson.toJson(wallet);
-                buffer.putInt(Integer.BYTES + Character.BYTES + jsonWallet.length());
+                buffer.putInt(jsonWallet.length());
                 try {
                     client.write(buffer);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                bufferCapacity = Integer.BYTES + Character.BYTES + jsonWallet.length();
-                buffer = ByteBuffer.allocate(bufferCapacity);
-                String outcome = NetError.NONE.getCode() + "|" + jsonWallet;
-                buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
+                buffer = ByteBuffer.allocate(jsonWallet.length());
+                buffer.put(jsonWallet.getBytes(StandardCharsets.UTF_8));
 
             } catch (UserNotYetLoggedInException e) {
 
@@ -753,16 +693,14 @@ public enum Task implements Runnable {
                 Wallet wallet = SocialNetworkManager.getWalletBTC(client);
                 Gson gson = new Gson();
                 String jsonWallet = gson.toJson(wallet);
-                buffer.putInt(Integer.BYTES + Character.BYTES + jsonWallet.length());
+                buffer.putInt(jsonWallet.length());
                 try {
                     client.write(buffer);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                bufferCapacity = Integer.BYTES + Character.BYTES + jsonWallet.length();
-                buffer = ByteBuffer.allocate(bufferCapacity);
-                String outcome = NetError.NONE.getCode() + "|" + jsonWallet;
-                buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
+                buffer = ByteBuffer.allocate(jsonWallet.length());
+                buffer.put(jsonWallet.getBytes(StandardCharsets.UTF_8));
 
             } catch (UserNotYetLoggedInException e) {
 
