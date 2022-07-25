@@ -43,7 +43,7 @@ public class ServerConfigurationParser extends ConfigurationParser {
     @Override
     public void parseConfiguration() {
 
-        Path filepath = Paths.get("client.cfg").toAbsolutePath();
+        Path filepath = Paths.get("Winsome_server/server.cfg").toAbsolutePath();
 
         try (BufferedReader  fileReader = new BufferedReader(new FileReader(filepath.toFile()))) {
 
@@ -58,7 +58,7 @@ public class ServerConfigurationParser extends ConfigurationParser {
                 line = line.trim();
                 if (!line.isEmpty() && !line.startsWith("#")) {
                     String[] words = line.split("=", 2);
-                    map.putIfAbsent(words[0], words[1]);
+                    map.putIfAbsent(words[0].trim(), words[1].trim());
                 }
 
             }

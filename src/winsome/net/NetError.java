@@ -1,5 +1,8 @@
 package winsome.net;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum NetError {
 
     NONE(0) {
@@ -79,6 +82,7 @@ public enum NetError {
     ;
 
     private final int code;
+    private static final Map<Integer, NetError> map = new HashMap<>();
 
     NetError(int code) {
         this.code = code;
@@ -87,5 +91,15 @@ public enum NetError {
     public int getCode(){ return code; }
 
     public abstract void showError();
+
+    static {
+        for (NetError error : NetError.values()) {
+            map.put(error.code, error);
+        }
+    }
+
+    public static NetError valueOf(int error) {
+        return map.get(error);
+    }
 
 }

@@ -1,12 +1,11 @@
 package winsome.config;
 
+import javax.sound.midi.SysexMessage;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ClientConfigurationParser extends ConfigurationParser {
 
@@ -31,7 +30,7 @@ public class ClientConfigurationParser extends ConfigurationParser {
     @Override
     public void parseConfiguration() {
 
-        Path filepath = Paths.get("client.cfg").toAbsolutePath();
+        Path filepath = Paths.get("Winsome_client/client.cfg").toAbsolutePath();
 
         try ( BufferedReader fileReader = new BufferedReader(new FileReader(filepath.toFile())) ) {
 
@@ -40,7 +39,7 @@ public class ClientConfigurationParser extends ConfigurationParser {
                 line = line.trim();
                 if ( !line.isEmpty() && !line.startsWith("#")) {
                     String[] words = line.split("=", 2);
-                    map.putIfAbsent(words[0], words[1]);
+                    map.putIfAbsent(words[0].trim(), words[1].trim());
                 }
             }
             host = map.get("host");
