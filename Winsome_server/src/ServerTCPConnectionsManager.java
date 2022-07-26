@@ -60,9 +60,9 @@ public class ServerTCPConnectionsManager {
                 else if ( key.isReadable() ) {
                     SocketChannel client = (SocketChannel) key.channel();
                     ByteBuffer clientData = ByteBuffer.allocate(Integer.BYTES);
-                    int readBytes;
+                    int readBytes = 0;
                     do {
-                        readBytes = client.read(clientData);
+                        readBytes += client.read(clientData);
                     } while (readBytes < Integer.BYTES);
                     clientData.flip();
                     int requestDim = clientData.getInt();
@@ -94,7 +94,6 @@ public class ServerTCPConnectionsManager {
     private Task createTask(ByteBuffer clientData, SocketChannel client) {
 
         String request = StandardCharsets.UTF_8.decode(clientData).toString();
-        System.out.println(request);
         String[] list = request.split("\\|");
         String command = list[0];
         Task task = Task.valueOf(command);

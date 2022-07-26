@@ -35,7 +35,7 @@ public final class Post {
         }
 
         public String toString() {
-            return timestamp + author + ": " + text + "\n";
+            return timestamp + " " + author + ": " + text + "\n";
         }
 
     }
@@ -108,10 +108,10 @@ public final class Post {
     }
 
     public String toString() {
-        return "Title: " + title + "\n"
+        return  "Title: " + title + "\n"
                 + "Content: " + content + "\n"
-                + "vote: " + upvotes + "positive" + ", " +  downvotes + "negative"
-                + comments;
+                + "Votes: " + upvotes.size() + " positive" + ", " +  downvotes.size() + " negative\n"
+                + "Comments: " + comments;
     }
 
     /**

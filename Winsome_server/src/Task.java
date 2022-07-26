@@ -157,7 +157,7 @@ public enum Task implements Runnable {
                         else
                             outcome = outcome.concat(user.getUsername() + "|" + jsonUserTags);
                     }
-                    buffer.putInt(outcome.length());
+                    buffer.putInt(outcome.getBytes(StandardCharsets.UTF_8).length);
                     try {
                         buffer.flip();
                         client.write(buffer);
@@ -231,7 +231,7 @@ public enum Task implements Runnable {
                         else
                             outcome = outcome.concat(user.getUsername() + "|" + jsonUserTags);
                     }
-                    buffer.putInt(outcome.length());
+                    buffer.putInt(outcome.getBytes(StandardCharsets.UTF_8).length);
                     try {
                         buffer.flip();
                         client.write(buffer);
@@ -370,7 +370,7 @@ public enum Task implements Runnable {
                         else
                             outcome = outcome.concat(post.getID() + "|" + post.getOwner() + "|" + post.getTitle());
                     }
-                    buffer.putInt(outcome.length());
+                    buffer.putInt(outcome.getBytes(StandardCharsets.UTF_8).length);
                     try {
                         buffer.flip();
                         client.write(buffer);
@@ -474,7 +474,7 @@ public enum Task implements Runnable {
                         else
                             outcome = outcome.concat(post.getID() + "|" + post.getOwner() + "|" + post.getTitle());
                     }
-                    buffer.putInt(outcome.length());
+                    buffer.putInt(outcome.getBytes(StandardCharsets.UTF_8).length);
                     try {
                         buffer.flip();
                         client.write(buffer);

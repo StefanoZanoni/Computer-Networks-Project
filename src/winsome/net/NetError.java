@@ -36,7 +36,7 @@ public enum NetError {
     POSTNOTINTHEFEED(5){
         @Override
         public void showError() {
-            System.err.println("< Error: You cannot rate a post of a user you not follow");
+            System.err.println("< Error: You cannot rate or comment a post of a user you not follow");
         }
     },
     ISTHEAUTHOR(6){

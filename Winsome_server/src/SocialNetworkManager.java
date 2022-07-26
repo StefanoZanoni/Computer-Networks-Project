@@ -258,6 +258,7 @@ public class SocialNetworkManager {
             throw new UserIsNotTheOwnerException();
 
         posts.remove(idPost, post);
+        // stall on remove
         postsNetwork.get(username).remove(idPost);
 
     }

@@ -127,25 +127,17 @@ public class ClientTCPConnectionManager {
     @SafeVarargs
     private <T> void send(String command, T... arguments) {
 
-        int bufferCapacity;
         command = command.replaceAll("\\s+", "");
         command = command.toUpperCase();
-        bufferCapacity = command.getBytes(StandardCharsets.UTF_8).length;
 
-        if (arguments.length != 0) {
-
-            // number of bytes of all |
-            int argumentsDim = "|".getBytes(StandardCharsets.UTF_8).length * arguments.length;
-
-            for (T argument : arguments) {
-                if (argument instanceof Integer)
-                    argumentsDim += Integer.BYTES;
-                else if (argument instanceof String)
-                    argumentsDim += ((String) argument).getBytes(StandardCharsets.UTF_8).length;
-            }
-            bufferCapacity += argumentsDim;
-
+        String request = command;
+        Iterator<T> iterator = Arrays.stream(arguments).iterator();
+        while (iterator.hasNext()) {
+            request = request.concat("|");
+            T argument = iterator.next();
+            request = request.concat(argument.toString());
         }
+        int bufferCapacity = request.getBytes(StandardCharsets.UTF_8).length;
 
         ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
         buffer.putInt(bufferCapacity);
@@ -157,20 +149,7 @@ public class ClientTCPConnectionManager {
         }
 
         buffer = ByteBuffer.allocate(bufferCapacity);
-        buffer.put( command.getBytes(StandardCharsets.UTF_8) );
-        Iterator<T> iterator = Arrays.stream(arguments).iterator();
-        while (iterator.hasNext()) {
-
-            buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
-            T argument = iterator.next();
-            if (argument instanceof Integer) {
-                buffer.putInt((Integer) argument);
-            }
-            else if (argument instanceof String) {
-                buffer.put( ((String) argument).getBytes(StandardCharsets.UTF_8) );
-            }
-
-        }
+        buffer.put( request.getBytes(StandardCharsets.UTF_8) );
 
         try {
             buffer.flip();
