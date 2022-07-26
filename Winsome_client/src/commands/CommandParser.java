@@ -17,13 +17,13 @@ public class CommandParser {
         Matcher regexMatcher = regex.matcher(scanner.nextLine());
         while (regexMatcher.find()) {
             if (regexMatcher.group(1) != null) {
-                // Add double-quoted string without the quotes
+                // add double-quoted string without the quotes
                 words.add(regexMatcher.group(1));
             } else if (regexMatcher.group(2) != null) {
-                // Add single-quoted string without the quotes
+                // add single-quoted string without the quotes
                 words.add(regexMatcher.group(2));
             } else {
-                // Add unquoted word
+                // add unquoted word
                 words.add(regexMatcher.group());
             }
         }
@@ -31,7 +31,7 @@ public class CommandParser {
         command = words.get(0);
         if ( command.compareTo("list") == 0 || command.compareTo("show") == 0 ||
                 (command.compareTo("wallet") == 0 && !words.subList(1, words.size()).isEmpty()) )
-            command = command.concat(" " + words.get(1));
+            command = command.concat(" " + words.remove(1));
 
         switch (command) {
 
@@ -40,18 +40,18 @@ public class CommandParser {
                     throw new IllegalArgumentException("");
             }
 
-            case "login", "post", "add comment", "rate", "show post" -> {
+            case "login", "post", "comment", "rate" -> {
                 if (words.size() != 3)
                     throw new IllegalArgumentException("The number of inserted arguments is not valid\n");
             }
 
-            case "logout", "blog", "wallet" -> {
+            case "logout", "blog", "wallet", "list users", "list following",
+                                "list followers", "show feed", "wallet btc" -> {
                 if (words.size() > 1)
                     throw new IllegalArgumentException("The number of inserted arguments is not valid\n");
             }
 
-            case "follow", "rewin", "delete post", "unfollow",
-                    "list users", "show feed", "wallet btc", "list following", "list followers" -> {
+            case "follow", "rewin", "delete", "unfollow", "show post" -> {
                 if (words.size() != 2)
                     throw new IllegalArgumentException("The number of inserted arguments is not valid\n");
             }

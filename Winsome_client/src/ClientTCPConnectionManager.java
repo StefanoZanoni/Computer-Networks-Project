@@ -52,7 +52,7 @@ public class ClientTCPConnectionManager {
                 switch (command) {
 
                     case "register" -> {
-                        register(arguments.get(0), arguments.get(1).toCharArray(),
+                        register(arguments.get(0), arguments.get(1),
                                 arguments.subList(2, arguments.size()));
                         receive();
                     }
@@ -124,31 +124,29 @@ public class ClientTCPConnectionManager {
 
     }
 
-    private void send(String command, Object... arguments) {
+    @SafeVarargs
+    private <T> void send(String command, T... arguments) {
 
         int bufferCapacity;
         command = command.replaceAll("\\s+", "");
         command = command.toUpperCase();
-        bufferCapacity = command.length() * Character.BYTES;
+        bufferCapacity = command.getBytes(StandardCharsets.UTF_8).length;
 
         if (arguments.length != 0) {
 
             // number of bytes of all |
-            int argumentsDim = arguments.length * Character.BYTES;
+            int argumentsDim = "|".getBytes(StandardCharsets.UTF_8).length * arguments.length;
 
-            for (Object object : arguments) {
-                if (object instanceof Integer)
+            for (T argument : arguments) {
+                if (argument instanceof Integer)
                     argumentsDim += Integer.BYTES;
-                else if (object instanceof String)
-                    argumentsDim += ((String) object).length() * Character.BYTES;
-                else if (object instanceof char[])
-                    argumentsDim += ((char[]) object).length * Character.BYTES;
+                else if (argument instanceof String)
+                    argumentsDim += ((String) argument).getBytes(StandardCharsets.UTF_8).length;
             }
             bufferCapacity += argumentsDim;
 
         }
 
-        bufferCapacity = bufferCapacity / 2;
         ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
         buffer.putInt(bufferCapacity);
         try {
@@ -160,20 +158,18 @@ public class ClientTCPConnectionManager {
 
         buffer = ByteBuffer.allocate(bufferCapacity);
         buffer.put( command.getBytes(StandardCharsets.UTF_8) );
-        Iterator<Object> iterator = Arrays.stream(arguments).iterator();
+        Iterator<T> iterator = Arrays.stream(arguments).iterator();
         while (iterator.hasNext()) {
+
             buffer.put( "|".getBytes(StandardCharsets.UTF_8) );
-            Object object = iterator.next();
-            if (object instanceof Integer) {
-                buffer.putInt( (Integer) object );
+            T argument = iterator.next();
+            if (argument instanceof Integer) {
+                buffer.putInt((Integer) argument);
             }
-            else if (object instanceof String) {
-                buffer.put( ((String) object).getBytes(StandardCharsets.UTF_8) );
+            else if (argument instanceof String) {
+                buffer.put( ((String) argument).getBytes(StandardCharsets.UTF_8) );
             }
-            else if (object instanceof char[]) {
-                ByteBuffer temp = StandardCharsets.UTF_8.encode(CharBuffer.wrap((char[]) object));
-                buffer.put(temp);
-            }
+
         }
 
         try {
@@ -389,7 +385,7 @@ public class ClientTCPConnectionManager {
 
     }
 
-    private void register(String username, char[] password, List<String> tags) {
+    private void register(String username, String password, List<String> tags) {
 
         if (username == null || password == null || tags == null)
             throw new NullPointerException();
@@ -418,7 +414,7 @@ public class ClientTCPConnectionManager {
             System.out.println("4) a special character must occur at least once\n");
             System.out.println("5) no whitespace allowed in the entire password\n");
             System.out.print("> ");
-            password = scanner.next().toCharArray();
+            password = scanner.next();
 
         }
 
@@ -436,8 +432,6 @@ public class ClientTCPConnectionManager {
             send("register", username, password, tags.get(0), tags.get(1), tags.get(2),
                                         tags.get(3), tags.get(4));
 
-        Arrays.fill(password, (char) 0);
-
     }
 
     private boolean validateUsername(String username) {
@@ -449,11 +443,11 @@ public class ClientTCPConnectionManager {
 
     }
 
-    private boolean validatePassword(char[] password) {
+    private boolean validatePassword(String password) {
 
         String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–{}:;',?/*~$^+=<>]).{8,}$";
         Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(CharBuffer.wrap(password));
+        Matcher matcher = pattern.matcher(password);
         return matcher.matches();
 
     }
