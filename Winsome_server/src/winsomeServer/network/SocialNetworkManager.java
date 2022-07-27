@@ -293,11 +293,9 @@ public class SocialNetworkManager {
             throw new PostDoesNotExistException();
         if (!feed.contains(post))
             throw new PostNotInTheFeedException();
-        List<String> upVotes = post.getUpvotes();
-        if (upVotes.contains(username))
+        if (post.getUpvotes().contains(username))
             throw new PostAlreadyVotedException();
-        List<String> downVotes = post.getDownvotes();
-        if (downVotes.contains(username))
+        if (post.getDownvotes().contains(username))
             throw new PostAlreadyVotedException();
         if (post.getOwner().equals(username))
             throw new UserIsTheAuthorException();
@@ -305,9 +303,9 @@ public class SocialNetworkManager {
             throw new InvalidVoteException();
 
         if (vote == 1)
-            upVotes.add(username);
+            post.addUpvote(username);
         else
-            downVotes.add(username);
+            post.addDownvote(username);
 
     }
 
@@ -322,7 +320,7 @@ public class SocialNetworkManager {
         if (post.getOwner().compareTo(username) == 0)
             throw new UserIsTheAuthorException();
 
-        post.addComment(new Post.Comment(username, text));
+        post.addComment(username, text);
 
     }
 

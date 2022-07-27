@@ -7,7 +7,7 @@ import java.util.List;
 
 public final class Wallet {
 
-    public static class Transaction {
+    private static class Transaction {
 
         private final float increment;
         private final String timestamp;
@@ -20,11 +20,9 @@ public final class Wallet {
         }
 
         public String getTimestamp() { return timestamp; }
-
         public float getIncrement() { return increment; }
-
         @Override
-        public String toString() { return "gain: " + increment + timestamp; }
+        public String toString() { return "gain: " + this.getIncrement() + " " + this.getTimestamp(); }
 
     }
 
@@ -43,6 +41,9 @@ public final class Wallet {
     public float getRewards() { return rewards; }
     public void setRewardsBTC(float rewardsBTC) { rewards = rewardsBTC; }
     @Override
-    public String toString() { return "rewards: " + this.getRewards() + "\ntransactions: " + this.getTransactions(); }
+    public String toString() {
+        return "rewards: " + this.getRewards() + "\n" +
+               "transactions: " + this.getTransactions();
+    }
 
 }
