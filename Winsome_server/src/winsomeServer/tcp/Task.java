@@ -1,9 +1,12 @@
+package winsomeServer.tcp;
+
 import com.google.gson.Gson;
 import winsome.base.Post;
 import winsome.base.User;
 import winsome.base.Wallet;
 import winsome.net.*;
 import winsome.net.exceptions.*;
+import winsomeServer.network.SocialNetworkManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

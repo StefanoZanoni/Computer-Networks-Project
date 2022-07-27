@@ -1,3 +1,5 @@
+package winsomeServer.tcp;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -14,7 +16,7 @@ public class ServerTCPConnectionsManager {
     Selector selector;
     ServerSocketChannel socketChannel;
 
-    ServerTCPConnectionsManager(ExecutorService threadPool, String host, int port) {
+    public ServerTCPConnectionsManager(ExecutorService threadPool, String host, int port) {
 
         this.threadPool = threadPool;
 

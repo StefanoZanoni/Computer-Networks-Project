@@ -1,9 +1,7 @@
-import commands.CommandParser;
-import commands.UnknownCommandException;
+import winsomeClient.commands.CommandParser;
+import winsomeClient.commands.UnknownCommandException;
 import winsome.config.ClientConfigurationParser;
-
-import javax.sound.midi.SysexMessage;
-import java.awt.datatransfer.SystemFlavorMap;
+import winsomeClient.tcp.ClientTCPConnectionManager;
 
 public class WinsomeClient {
 

@@ -25,6 +25,7 @@ public final class User {
     public List<String> getTags() { return tags; }
     public Wallet getWallet() { return wallet; }
 
+
     @Override
     public String toString() {
         return "user: " + username + "\ntags: " + tags.toString() + "\nwallet: " + wallet;

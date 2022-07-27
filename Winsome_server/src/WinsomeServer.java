@@ -1,5 +1,8 @@
 import winsome.config.ServerConfigurationParser;
+import winsomeServer.network.RewardsCalculator;
+import winsomeServer.tcp.ServerTCPConnectionsManager;
 
+import java.util.Timer;
 import java.util.concurrent.*;
 
 public class WinsomeServer {
@@ -15,6 +18,9 @@ public class WinsomeServer {
 
         ServerTCPConnectionsManager tcpConnectionsManager = new ServerTCPConnectionsManager(threadPool,
                 configurationParser.getHost(), configurationParser.getTcpPort() );
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new RewardsCalculator(), 1000, configurationParser.getWalletUpdateTime() * 1000L);
 
         while(true) {
             tcpConnectionsManager.select();

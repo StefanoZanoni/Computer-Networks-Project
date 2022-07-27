@@ -1,6 +1,8 @@
+package winsomeClient.tcp;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import commands.UnknownCommandException;
+import winsomeClient.commands.UnknownCommandException;
 import winsome.base.Post;
 import winsome.base.Wallet;
 import winsome.net.NetError;
@@ -9,7 +11,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.*;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

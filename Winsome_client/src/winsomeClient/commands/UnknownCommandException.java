@@ -1,4 +1,4 @@
-package commands;
+package winsomeClient.commands;
 
 public class UnknownCommandException extends Exception {
 

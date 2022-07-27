@@ -1,3 +1,5 @@
+package winsomeServer.network;
+
 import winsome.base.Post;
 import winsome.base.User;
 import winsome.base.Wallet;
@@ -12,22 +14,23 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SocialNetworkManager {
 
     // client -> user
-    static ConcurrentHashMap<SocketChannel, String> connections = new ConcurrentHashMap<>();
+    static final ConcurrentHashMap<SocketChannel, String> connections = new ConcurrentHashMap<>();
 
     // username -> user: this is the list of all users in Winsome
-    static ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
+    static final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
 
     // tag -> list users: for each tag this hashmap stores the list of users having that tag
-    static ConcurrentHashMap<String, List<String>> tagsNetwork = new ConcurrentHashMap<>();
+    static final ConcurrentHashMap<String, List<String>> tagsNetwork = new ConcurrentHashMap<>();
 
     // user -> followed
-    static ConcurrentHashMap<String, List<String>> usersNetwork = new ConcurrentHashMap<>();
+    static final ConcurrentHashMap<String, List<String>> usersNetwork = new ConcurrentHashMap<>();
 
     // user -> posts
-    static ConcurrentHashMap<String, List<Integer>> postsNetwork = new ConcurrentHashMap<>();
+    static final ConcurrentHashMap<String, List<Integer>> postsNetwork = new ConcurrentHashMap<>();
 
     // id -> post
-    static ConcurrentHashMap<Integer, Post> posts = new ConcurrentHashMap<>();
+    static final ConcurrentHashMap<Integer, Post> posts = new ConcurrentHashMap<>();
+
     public static void uncouple(SocketChannel client) throws UserNotYetLoggedInException {
 
         if (!connections.containsKey(client))

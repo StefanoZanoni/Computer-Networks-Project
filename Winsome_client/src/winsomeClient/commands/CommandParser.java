@@ -1,4 +1,4 @@
-package commands;
+package winsomeClient.commands;
 
 import java.util.*;
 import java.util.regex.Matcher;

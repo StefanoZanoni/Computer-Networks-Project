@@ -90,9 +90,7 @@ public final class Post {
         upvotes.add(username);
     }
 
-    public List<String> getUpvotes() {
-        return upvotes;
-    }
+    public List<String> getUpvotes() { return upvotes; }
 
     public synchronized void addDownvote(String username) {
         downvotes.add(username);
@@ -129,8 +127,8 @@ public final class Post {
     public float computeReward(int numberOfPreviousUpvotes, int numberOfPreviousDownvotes,
                                int numberOfPreviousComments, int age) {
 
-        return (float) ((log(max((upvotes.size() - numberOfPreviousUpvotes - (downvotes.size() - numberOfPreviousDownvotes)), 0) + 1)
-                + log((computeCommentsValue(numberOfPreviousComments)) + 1)) / age);
+        return (float) ( (log(max((upvotes.size() - numberOfPreviousUpvotes - (downvotes.size() - numberOfPreviousDownvotes)), 0) + 1)
+                + log((computeCommentsValue(numberOfPreviousComments)) + 1)) / age );
 
     }
 
@@ -158,21 +156,25 @@ public final class Post {
 
         Map<String, UserCounter> peopleChecked = new HashMap<>();
 
-        for (Comment comment : comments.subList(numberOfPreviousComments + 1, comments.size())) {
+        if (!comments.isEmpty()) {
 
-            String author = comment.getAuthor();
-            UserCounter userCounter = peopleChecked.get(author);
-            if (userCounter == null)
-                peopleChecked.put(author, new UserCounter());
-            else
-                userCounter.increment();
+            for (Comment comment : comments.subList(numberOfPreviousComments + 1, comments.size())) {
 
-        }
+                String author = comment.getAuthor();
+                UserCounter userCounter = peopleChecked.get(author);
+                if (userCounter == null)
+                    peopleChecked.put(author, new UserCounter());
+                else
+                    userCounter.increment();
 
-        for (Comment comment : comments.subList(numberOfPreviousComments + 1, comments.size())) {
+            }
 
-            String author = comment.getAuthor();
-            commentsValue += (2 / (1 + exp(1 - peopleChecked.get(author).getValue())));
+            for (Comment comment : comments.subList(numberOfPreviousComments + 1, comments.size())) {
+
+                String author = comment.getAuthor();
+                commentsValue += (2 / (1 + exp(1 - peopleChecked.get(author).getValue())));
+
+            }
 
         }
 

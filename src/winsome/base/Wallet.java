@@ -4,16 +4,15 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 public final class Wallet {
 
-    private static class Transaction {
+    public static class Transaction {
 
         private final float increment;
         private final String timestamp;
 
-        public Transaction(float increment) {
+        private Transaction(float increment) {
 
             this.increment = increment;
             timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
@@ -32,10 +31,11 @@ public final class Wallet {
     private float rewards = 0;
     private final List<Transaction> transactionsHistory = new LinkedList<>();
 
-    public void addTransaction(Transaction transaction) {
+    public void addTransaction(float increment) {
 
+        Transaction transaction  = new Transaction(increment);
         transactionsHistory.add(transaction);
-        rewards += transaction.getIncrement();
+        rewards += increment;
 
     }
 
@@ -43,6 +43,6 @@ public final class Wallet {
     public float getRewards() { return rewards; }
     public void setRewardsBTC(float rewardsBTC) { rewards = rewardsBTC; }
     @Override
-    public String toString() { return "rewards: " + rewards + "\ntransactions: " + transactionsHistory; }
+    public String toString() { return "rewards: " + this.getRewards() + "\ntransactions: " + this.getTransactions(); }
 
 }
