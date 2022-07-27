@@ -1,6 +1,7 @@
 import winsomeClient.commands.CommandParser;
 import winsomeClient.commands.UnknownCommandException;
 import winsome.config.ClientConfigurationParser;
+import winsomeClient.shutdown.ShutdownHook;
 import winsomeClient.tcp.ClientTCPConnectionManager;
 
 public class WinsomeClient {
@@ -15,6 +16,9 @@ public class WinsomeClient {
 
         CommandParser commandParser = new CommandParser();
         String command = "valid";
+
+        ShutdownHook shutdownHook = new ShutdownHook(tcpConnectionManager, commandParser);
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         do {
 
@@ -32,8 +36,8 @@ public class WinsomeClient {
 
         } while(command.compareTo("logout") != 0);
 
-        commandParser.close();
-        tcpConnectionManager.close();
+        shutdownHook.setCorrectTermination(true);
 
     }
+
 }
