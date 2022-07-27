@@ -40,7 +40,8 @@ public final class Post {
 
     }
 
-    private final AtomicInteger ID = new AtomicInteger(0);
+    private static final AtomicInteger IDCounter = new AtomicInteger(1000);
+    private final int ID;
     private final String owner;
     private final String title;
     private final String content;
@@ -54,7 +55,7 @@ public final class Post {
         if (owner == null || title == null || content == null)
             throw new NullPointerException();
 
-        ID.getAndIncrement();
+        ID = IDCounter.getAndIncrement();
         this.owner = owner;
         this.title = title;
         this.content = content;
@@ -62,7 +63,7 @@ public final class Post {
     }
 
     public int getID() {
-        return ID.get();
+        return ID;
     }
 
     public String getOwner() {

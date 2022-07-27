@@ -192,15 +192,18 @@ public class SocialNetworkManager {
 
     }
 
-    public static void addPost(SocketChannel client, String title, String content) throws UserNotYetLoggedInException {
+    public static int addPost(SocketChannel client, String title, String content) throws UserNotYetLoggedInException {
 
         String username = connections.get(client);
         if (username == null)
             throw new UserNotYetLoggedInException();
 
         Post newPost = new Post(username, title, content);
-        posts.put(newPost.getID(), newPost);
-        postsNetwork.get(username).add(newPost.getID());
+        int ID = newPost.getID();
+        posts.put(ID, newPost);
+        postsNetwork.get(username).add(ID);
+
+        return ID;
 
     }
 
@@ -257,9 +260,8 @@ public class SocialNetworkManager {
         if (!post.getOwner().equals(username))
             throw new UserIsNotTheOwnerException();
 
+        postsNetwork.get(username).remove((Object) idPost);
         posts.remove(idPost, post);
-        // stall on remove
-        postsNetwork.get(username).remove(idPost);
 
     }
 

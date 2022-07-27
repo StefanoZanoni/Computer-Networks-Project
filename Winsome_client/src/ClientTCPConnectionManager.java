@@ -170,8 +170,13 @@ public class ClientTCPConnectionManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        NetError error = NetError.valueOf(buffer.getInt());
-        error.showError();
+        int outcome = buffer.getInt();
+        if (outcome >= 1000)
+            System.out.println("< Post created successfully: ID " + outcome);
+        else {
+            NetError error = NetError.valueOf(outcome);
+            error.showError();
+        }
 
     }
 

@@ -434,8 +434,8 @@ public enum Task implements Runnable {
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
             try {
-                SocialNetworkManager.addPost(client, title, content);
-                buffer.putInt( NetError.NONE.getCode() );
+                int ID = SocialNetworkManager.addPost(client, title, content);
+                buffer.putInt( ID );
             } catch (UserNotYetLoggedInException e) {
                 buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
             }
