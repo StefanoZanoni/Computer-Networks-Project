@@ -786,7 +786,9 @@ public enum Task implements Runnable {
 
             try {
 
-                Wallet wallet = SocialNetworkManager.getWalletBTC(client);
+                Map<Float, Wallet> pair = SocialNetworkManager.getWalletBTC(client);
+                Wallet wallet = pair.values().stream().findFirst().get();
+                float exchangeRate = pair.keySet().stream().findFirst().get();
                 Gson gson = new Gson();
                 String jsonWallet = gson.toJson(wallet);
                 buffer.putInt(jsonWallet.length());
@@ -798,6 +800,7 @@ public enum Task implements Runnable {
                 }
                 buffer = ByteBuffer.allocate(jsonWallet.length());
                 buffer.put(jsonWallet.getBytes(StandardCharsets.UTF_8));
+                wallet.setRewardsBTC(wallet.getRewards() / exchangeRate);
 
             } catch (UserNotYetLoggedInException e) {
 

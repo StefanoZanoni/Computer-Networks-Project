@@ -291,14 +291,14 @@ public class SocialNetworkManager {
         Post post = posts.get(idPost);
         if (post == null)
             throw new PostDoesNotExistException();
+        if (post.getOwner().equals(username))
+            throw new UserIsTheAuthorException();
         if (!feed.contains(post))
             throw new PostNotInTheFeedException();
         if (post.getUpvotes().contains(username))
             throw new PostAlreadyVotedException();
         if (post.getDownvotes().contains(username))
             throw new PostAlreadyVotedException();
-        if (post.getOwner().equals(username))
-            throw new UserIsTheAuthorException();
         if (vote != 1 && vote != -1)
             throw new InvalidVoteException();
 
@@ -335,18 +335,22 @@ public class SocialNetworkManager {
 
     }
 
-    public static Wallet getWalletBTC(SocketChannel client) throws UserNotYetLoggedInException, IOException {
+    public static Map<Float, Wallet> getWalletBTC(SocketChannel client) throws UserNotYetLoggedInException, IOException {
+
+        Map<Float, Wallet> returnPair = new HashMap<>(1);
 
         Wallet wallet = SocialNetworkManager.getWallet(client);
 
         URL url = new URL("https://www.random.org/decimal-fractions/?num=1&dec=10&col=1&format=plain&rnd=new");
         Scanner scanner = new Scanner(url.openStream());
+
         // exchangeRate is in [0.5, 1.5]
         float exchangeRate = Float.parseFloat(scanner.next()) + 1;
+        returnPair.put(exchangeRate, wallet);
         float rewardsBTC = wallet.getRewards() * exchangeRate;
         wallet.setRewardsBTC(rewardsBTC);
 
-        return wallet;
+        return returnPair;
 
     }
 
