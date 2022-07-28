@@ -2,7 +2,6 @@ package winsomeServer.network;
 
 import winsome.base.Post;
 
-import javax.xml.stream.events.Comment;
 import java.util.*;
 
 public class RewardsCalculator extends TimerTask {
