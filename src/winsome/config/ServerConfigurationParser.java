@@ -17,6 +17,11 @@ public class ServerConfigurationParser extends ConfigurationParser {
     private int taskQueueDimension;
     private int walletUpdateTime;
     private int authorEarnPercentage;
+    private String usersDirPath;
+    private String usersNetworkDirPath;
+    private String postsDirPath;
+    private String postsNetworkDirPath;
+    private String tagsNetworkDirPath;
 
     protected void setDefault() {
         host = "localhost";
@@ -38,6 +43,12 @@ public class ServerConfigurationParser extends ConfigurationParser {
         taskQueueDimension = 20;
         walletUpdateTime = 60;
         authorEarnPercentage = 75;
+        usersDirPath = "Winsome_server/users/";
+        usersNetworkDirPath = "Winsome_server/users_network/";
+        postsDirPath = "Winsome_server/posts/";
+        postsNetworkDirPath = "Winsome_server/posts_network/";
+        tagsNetworkDirPath = "Winsome_server/tags_network/";
+
     }
 
     @Override
@@ -76,6 +87,11 @@ public class ServerConfigurationParser extends ConfigurationParser {
             taskQueueDimension = Integer.parseInt(map.get("taskQueueDimension"));
             walletUpdateTime = Integer.parseInt(map.get("walletUpdateTime"));
             authorEarnPercentage = Integer.parseInt(map.get("authorEarnPercentage"));
+            usersDirPath = map.get("usersDirPath");
+            usersNetworkDirPath = map.get("usersNetworkDirPath");
+            postsDirPath = map.get("postsDirPath");
+            postsNetworkDirPath = map.get("postsNetworkDirPath");
+            tagsNetworkDirPath = map.get("tagsNetworkDirPath");
 
         }
         catch (FileNotFoundException e) {
@@ -91,31 +107,23 @@ public class ServerConfigurationParser extends ConfigurationParser {
     }
 
     public String getRmiCallbackName() { return rmiCallbackName; }
-
     public String getRegisterName() { return registerName; }
-
     public int getTcpPort() { return tcpPort; }
-
     public int getRmiCallbackPort() { return rmiCallbackPort; }
-
     public int getRegisterPort() { return registerPort; }
-
     public int getMulticastPort() { return multicastPort; }
-
     public String getHost() { return host; }
-
     public int getAuthorEarnPercentage() { return authorEarnPercentage; }
-
     public int getCorePoolSize() { return corePoolSize; }
-
     public int getKeepAliveTime() { return keepAliveTime; }
-
     public int getMaximumPoolSize() { return maximumPoolSize; }
-
     public int getTaskQueueDimension() { return taskQueueDimension; }
-
     public int getWalletUpdateTime() { return walletUpdateTime; }
-
     public InetAddress getMulticastIP() { return multicastIP; }
+    public String getUsersDirPath() { return usersDirPath; }
+    public String getUsersNetworkDirPath() { return usersNetworkDirPath; }
+    public String getPostsDirPath() { return postsDirPath; }
+    public String getPostsNetworkDirPath() { return postsNetworkDirPath; }
+    public String getTagsNetworkDirPath() {return tagsNetworkDirPath; }
 
 }

@@ -17,19 +17,19 @@ public class SocialNetworkManager {
     static final ConcurrentHashMap<SocketChannel, String> connections = new ConcurrentHashMap<>();
 
     // username -> user: this is the list of all users in Winsome
-    static final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<String, User> users;
 
     // tag -> list users: for each tag this hashmap stores the list of users having that tag
-    static final ConcurrentHashMap<String, List<String>> tagsNetwork = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<String, List<String>> tagsNetwork;
 
     // user -> followed
-    static final ConcurrentHashMap<String, List<String>> usersNetwork = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<String, List<String>> usersNetwork;
 
     // user -> posts
-    static final ConcurrentHashMap<String, List<Integer>> postsNetwork = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<String, List<Integer>> postsNetwork;
 
     // id -> post
-    static final ConcurrentHashMap<Integer, Post> posts = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<Integer, Post> posts;
 
     public static void uncouple(SocketChannel client) throws UserNotYetLoggedInException {
 
@@ -263,7 +263,7 @@ public class SocialNetworkManager {
         if (!post.getOwner().equals(username))
             throw new UserIsNotTheOwnerException();
 
-        postsNetwork.get(username).remove((Object) idPost);
+        postsNetwork.get(username).remove((Integer) idPost);
         posts.remove(idPost, post);
 
     }
