@@ -2,6 +2,7 @@ import winsome.config.ServerConfigurationParser;
 import winsomeServer.network.RewardsCalculator;
 import winsomeServer.network.StateLoader;
 import winsomeServer.network.StateWriter;
+import winsomeServer.shutdown.ServerShutdownHook;
 import winsomeServer.tcp.ServerTCPConnectionsManager;
 
 import java.util.Timer;
@@ -31,12 +32,18 @@ public class WinsomeServer {
                 configurationParser.getHost(), configurationParser.getTcpPort() );
 
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new RewardsCalculator(), 1000, configurationParser.getWalletUpdateTime() * 1000L);
-        timer.scheduleAtFixedRate(new StateWriter(statePaths), 1000, 10000);
 
-        while(true) {
-            tcpConnectionsManager.select();
-        }
+        RewardsCalculator rewardsCalculator = new RewardsCalculator();
+        timer.scheduleAtFixedRate(rewardsCalculator, 1000, configurationParser.getWalletUpdateTime() * 1000L);
+
+        StateWriter stateWriter = new StateWriter(statePaths);
+        timer.scheduleAtFixedRate(stateWriter, 1000, 10000);
+
+        ServerShutdownHook shutdownHook = new ServerShutdownHook(tcpConnectionsManager, timer, stateWriter);
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+        tcpConnectionsManager.select();
+
     }
 
 }

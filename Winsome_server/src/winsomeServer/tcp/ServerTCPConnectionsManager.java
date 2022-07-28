@@ -9,9 +9,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ServerTCPConnectionsManager {
 
+    private boolean end = false;
     ExecutorService threadPool;
     Selector selector;
     ServerSocketChannel socketChannel;
@@ -38,53 +40,60 @@ public class ServerTCPConnectionsManager {
 
     public void select() {
 
-        try {
-            selector.select();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        while (true) {
 
-        Set<SelectionKey> readyKeys = selector.selectedKeys();
-        Iterator<SelectionKey> iterator = readyKeys.iterator();
-
-        while (iterator.hasNext()) {
-
-            SelectionKey key = iterator.next();
-            iterator.remove();
+            if (!end)
+                selector.wakeup();
+            else break;
 
             try {
-
-                if ( key.isAcceptable() ) {
-                    SocketChannel client = socketChannel.accept();
-                    client.configureBlocking(false);
-                    client.register(selector, SelectionKey.OP_READ);
-                }
-                else if ( key.isReadable() ) {
-                    SocketChannel client = (SocketChannel) key.channel();
-                    ByteBuffer clientData = ByteBuffer.allocate(Integer.BYTES);
-                    int readBytes = 0;
-                    do {
-                        readBytes += client.read(clientData);
-                    } while (readBytes < Integer.BYTES);
-                    clientData.flip();
-                    int requestDim = clientData.getInt();
-                    clientData = ByteBuffer.allocate(requestDim);
-                    readBytes = 0;
-                    do {
-                       readBytes += client.read(clientData);
-                    } while (readBytes < requestDim);
-                    clientData.flip();
-                    Task task = createTask(clientData, client);
-                    threadPool.submit(task);
-                }
-
+                selector.select();
             } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-                key.cancel();
+            Set<SelectionKey> readyKeys = selector.selectedKeys();
+            Iterator<SelectionKey> iterator = readyKeys.iterator();
+
+            while (iterator.hasNext()) {
+
+                SelectionKey key = iterator.next();
+                iterator.remove();
+
                 try {
-                    key.channel().close();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+
+                    if (key.isAcceptable()) {
+                        SocketChannel client = socketChannel.accept();
+                        client.configureBlocking(false);
+                        client.register(selector, SelectionKey.OP_READ);
+                    } else if (key.isReadable()) {
+                        SocketChannel client = (SocketChannel) key.channel();
+                        ByteBuffer clientData = ByteBuffer.allocate(Integer.BYTES);
+                        int readBytes = 0;
+                        do {
+                            readBytes += client.read(clientData);
+                        } while (readBytes < Integer.BYTES);
+                        clientData.flip();
+                        int requestDim = clientData.getInt();
+                        clientData = ByteBuffer.allocate(requestDim);
+                        readBytes = 0;
+                        do {
+                            readBytes += client.read(clientData);
+                        } while (readBytes < requestDim);
+                        clientData.flip();
+                        Task task = createTask(clientData, client);
+                        threadPool.submit(task);
+                    }
+
+                } catch (IOException e) {
+
+                    key.cancel();
+                    try {
+                        key.channel().close();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
                 }
 
             }
@@ -112,6 +121,42 @@ public class ServerTCPConnectionsManager {
             task.setAttributes( Arrays.asList(arguments) );
 
         return task;
+
+    }
+
+    public void close() {
+
+        end = true;
+
+        threadPool.shutdownNow();
+        try {
+            if (threadPool.awaitTermination(5, TimeUnit.SECONDS))
+                System.out.println("All executing tasks end correctly");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (socketChannel.isOpen()) {
+            try {
+                socketChannel.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        for (SelectionKey key : selector.keys()) {
+            try {
+                key.channel().close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        selector.wakeup();
+        try {
+            selector.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
