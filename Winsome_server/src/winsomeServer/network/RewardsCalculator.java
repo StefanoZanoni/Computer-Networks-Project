@@ -2,6 +2,7 @@ package winsomeServer.network;
 
 import winsome.base.Post;
 
+import javax.xml.stream.events.Comment;
 import java.util.*;
 
 public class RewardsCalculator extends TimerTask {
@@ -12,7 +13,10 @@ public class RewardsCalculator extends TimerTask {
         int[2] : numberOfPreviousComments
         int[3] : age
     */
-    HashMap<Post, int[]> previousStatistics = new HashMap<>();
+    private final HashMap<Post, int[]> previousStatistics = new HashMap<>();
+    private final float authorEarnPercentage;
+
+    public RewardsCalculator(float authorEarnPercentage1) { this.authorEarnPercentage = authorEarnPercentage1; }
 
     @Override
     public void run() {
@@ -27,12 +31,31 @@ public class RewardsCalculator extends TimerTask {
             else
                 reward = post.computeReward(0, 0, 0, 1);
 
-            if (reward != 0)
-                SocialNetworkManager.users.get(author).getWallet().addTransaction(reward);
+            if (reward != 0) {
+
+                float authorReward = reward * authorEarnPercentage;
+                SocialNetworkManager.users.get(author).getWallet().addTransaction(authorReward);
+
+                float curatorReward = reward * (1 - authorEarnPercentage);
+                Map<String, Boolean> peopleWhoInteracted = new HashMap<>();
+                for (String user : post.getUpvotes()) {
+                    peopleWhoInteracted.putIfAbsent(user, true);
+                }
+                for (String user : post.getCommentsAuthors()) {
+                    peopleWhoInteracted.putIfAbsent(user, true);
+                }
+                Set<String> people = peopleWhoInteracted.keySet();
+                int peopleWhoInteractedSize = people.size();
+                curatorReward /= peopleWhoInteractedSize;
+                for (String user : people) {
+                    SocialNetworkManager.users.get(user).getWallet().addTransaction(curatorReward);
+                }
+
+            }
 
             previousStatistics.get(post)[0] = post.getUpvotes().size();
             previousStatistics.get(post)[1] = post.getDownvotes().size();
-            previousStatistics.get(post)[2] = post.getComments().size();
+            previousStatistics.get(post)[2] = post.getNumberOfComments();
             previousStatistics.get(post)[3]++;
 
         }

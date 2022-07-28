@@ -40,9 +40,9 @@ public final class Post {
     private final String owner;
     private final String title;
     private final String content;
-    private final List<String> upvotes = new LinkedList<>();
-    private final List<String> downvotes = new LinkedList<>();
-    private final List<Comment> comments = new LinkedList<>();
+    private final List<String> upvotes = Collections.synchronizedList( new LinkedList<>() );
+    private final List<String> downvotes = Collections.synchronizedList( new LinkedList<>() );
+    private final List<Comment> comments = Collections.synchronizedList( new LinkedList<>() );
 
     public Post(String owner, String title, String content) {
 
@@ -68,20 +68,31 @@ public final class Post {
     public String getContent() {
         return content;
     }
-    public synchronized void addUpvote(String username) { upvotes.add(username); }
+    public void addUpvote(String username) { upvotes.add(username); }
     public List<String> getUpvotes() { return upvotes; }
-    public synchronized void addDownvote(String username) {
+    public void addDownvote(String username) {
         downvotes.add(username);
     }
     public List<String> getDownvotes() {
         return downvotes;
     }
-    public synchronized void addComment(String author, String text) {
+    public void addComment(String author, String text) {
         Comment comment = new Comment(author, text);
         comments.add(comment);
     }
-    public List<Comment> getComments() {
-        return comments;
+    public int getNumberOfComments() { return comments.size(); }
+    public List<String> getCommentsAuthors() {
+
+        List<String> commentsAuthors = new LinkedList<>();
+
+        for (Comment comment : comments) {
+            String author = comment.getAuthor();
+            if (!commentsAuthors.contains(author))
+                commentsAuthors.add(author);
+        }
+
+        return commentsAuthors;
+
     }
 
     public String toString() {

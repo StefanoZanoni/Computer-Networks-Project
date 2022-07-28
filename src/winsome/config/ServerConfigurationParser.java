@@ -16,7 +16,7 @@ public class ServerConfigurationParser extends ConfigurationParser {
     private int keepAliveTime;
     private int taskQueueDimension;
     private int walletUpdateTime;
-    private int authorEarnPercentage;
+    private float authorEarnPercentage;
     private String usersDirPath;
     private String usersNetworkDirPath;
     private String postsDirPath;
@@ -86,7 +86,7 @@ public class ServerConfigurationParser extends ConfigurationParser {
             keepAliveTime = Integer.parseInt(map.get("keepAliveTime"));
             taskQueueDimension = Integer.parseInt(map.get("taskQueueDimension"));
             walletUpdateTime = Integer.parseInt(map.get("walletUpdateTime"));
-            authorEarnPercentage = Integer.parseInt(map.get("authorEarnPercentage"));
+            authorEarnPercentage = Float.parseFloat(map.get("authorEarnPercentage")) / 100;
             usersDirPath = map.get("usersDirPath");
             usersNetworkDirPath = map.get("usersNetworkDirPath");
             postsDirPath = map.get("postsDirPath");
@@ -113,7 +113,7 @@ public class ServerConfigurationParser extends ConfigurationParser {
     public int getRegisterPort() { return registerPort; }
     public int getMulticastPort() { return multicastPort; }
     public String getHost() { return host; }
-    public int getAuthorEarnPercentage() { return authorEarnPercentage; }
+    public float getAuthorEarnPercentage() { return authorEarnPercentage; }
     public int getCorePoolSize() { return corePoolSize; }
     public int getKeepAliveTime() { return keepAliveTime; }
     public int getMaximumPoolSize() { return maximumPoolSize; }
