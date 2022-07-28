@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class StateWriter extends TimerTask {
+public class StateWriter extends TimerTask implements Runnable {
 
     private final Gson gson = new GsonBuilder()
                     .setPrettyPrinting()

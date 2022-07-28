@@ -1,7 +1,7 @@
 import winsomeClient.commands.CommandParser;
 import winsomeClient.commands.UnknownCommandException;
 import winsome.config.ClientConfigurationParser;
-import winsomeClient.shutdown.ShutdownHook;
+import winsomeClient.shutdown.ClientShutdownHook;
 import winsomeClient.tcp.ClientTCPConnectionManager;
 
 public class WinsomeClient {
@@ -17,7 +17,7 @@ public class WinsomeClient {
         CommandParser commandParser = new CommandParser();
         String command = "valid";
 
-        ShutdownHook shutdownHook = new ShutdownHook(tcpConnectionManager, commandParser);
+        ClientShutdownHook shutdownHook = new ClientShutdownHook(tcpConnectionManager, commandParser);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         do {

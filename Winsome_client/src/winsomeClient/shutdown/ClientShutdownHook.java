@@ -5,13 +5,13 @@ import winsomeClient.tcp.ClientTCPConnectionManager;
 
 import java.util.Collections;
 
-public class ShutdownHook extends Thread {
+public class ClientShutdownHook extends Thread {
 
     private final ClientTCPConnectionManager clientTCPConnectionManager;
     private final CommandParser commandParser;
     private boolean correctTermination = false;
 
-    public ShutdownHook(ClientTCPConnectionManager clientTCPConnectionManager, CommandParser commandParser) {
+    public ClientShutdownHook(ClientTCPConnectionManager clientTCPConnectionManager, CommandParser commandParser) {
 
         this.clientTCPConnectionManager = clientTCPConnectionManager;
         this.commandParser = commandParser;
