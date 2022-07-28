@@ -4,7 +4,7 @@ import winsome.config.ClientConfigurationParser;
 import winsomeClient.shutdown.ClientShutdownHook;
 import winsomeClient.tcp.ClientTCPConnectionManager;
 
-public class WinsomeClient {
+public class ClientMain {
 
     public static void main(String[] args) {
 

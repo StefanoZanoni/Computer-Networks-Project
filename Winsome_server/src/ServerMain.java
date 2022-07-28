@@ -8,7 +8,7 @@ import winsomeServer.tcp.ServerTCPConnectionsManager;
 import java.util.Timer;
 import java.util.concurrent.*;
 
-public class WinsomeServer {
+public class ServerMain {
 
     public static void main(String[] args) {
 
