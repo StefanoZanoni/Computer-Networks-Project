@@ -6,6 +6,7 @@ import winsome.base.User;
 import winsome.base.Wallet;
 import winsome.net.*;
 import winsome.net.exceptions.*;
+import winsomeServer.ServerMain;
 import winsomeServer.network.SocialNetworkManager;
 
 import java.io.IOException;
@@ -43,12 +44,36 @@ public enum Task implements Runnable {
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
             try {
+
                 List<String> tempTags = new LinkedList<>(tags);
                 SocialNetworkManager.addUser(client, username, password, tempTags);
-                buffer.putInt( NetError.NONE.getCode() );
+                Gson gson = new Gson();
+                String jsonMulticastAddress = gson.toJson(ServerMain.multicastIP);
+                String outcome = jsonMulticastAddress + "|" + ServerMain.multicastPort;
+                bufferCapacity = outcome.length();
+                buffer.putInt(bufferCapacity);
+                try {
+                    buffer.flip();
+                    client.write(buffer);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                buffer = ByteBuffer.allocate(bufferCapacity);
+                buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
                 tags.clear();
+
             } catch (UsernameAlreadyExistsException e) {
+
+                buffer.putInt(Integer.BYTES);
+                try {
+                    buffer.flip();
+                    client.write(buffer);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                buffer.clear();
                 buffer.putInt( NetError.USERNAMEALREADYEXISTS.getCode() );
+
             }
 
             try {
@@ -81,14 +106,58 @@ public enum Task implements Runnable {
             ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
 
             try {
+
                 SocialNetworkManager.checkUser(client, username, password);
-                buffer.putInt( NetError.NONE.getCode() );
+                Gson gson = new Gson();
+                String jsonMulticastAddress = gson.toJson(ServerMain.multicastIP);
+                String outcome = jsonMulticastAddress + "|" + ServerMain.multicastPort;
+                bufferCapacity = outcome.length();
+                buffer.putInt(bufferCapacity);
+                try {
+                    buffer.flip();
+                    client.write(buffer);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                buffer = ByteBuffer.allocate(bufferCapacity);
+                buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
+
             } catch (UserDoesNotExistException e) {
+
+                buffer.putInt(Integer.BYTES);
+                try {
+                    buffer.flip();
+                    client.write(buffer);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                buffer.clear();
                 buffer.putInt( NetError.USERDOESNOTEXIST.getCode() );
+
             } catch (UserAlreadyLoggedInException e) {
+
+                buffer.putInt(Integer.BYTES);
+                try {
+                    buffer.flip();
+                    client.write(buffer);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                buffer.clear();
                 buffer.putInt( NetError.USERALREADYLOGGEDIN.getCode() );
+
             } catch (WrongPasswordException e) {
+
+                buffer.putInt(Integer.BYTES);
+                try {
+                    buffer.flip();
+                    client.write(buffer);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                buffer.clear();
                 buffer.putInt( NetError.WRONGPASSWORD.getCode() );
+
             }
 
             try {

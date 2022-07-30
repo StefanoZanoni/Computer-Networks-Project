@@ -1,3 +1,5 @@
+package winsomeServer;
+
 import winsome.config.ServerConfigurationParser;
 import winsomeServer.network.RewardsCalculator;
 import winsomeServer.network.StateLoader;
@@ -5,15 +7,22 @@ import winsomeServer.network.StateWriter;
 import winsomeServer.shutdown.ServerShutdownHook;
 import winsomeServer.tcp.ServerTCPConnectionsManager;
 
+import java.net.InetAddress;
 import java.util.Timer;
 import java.util.concurrent.*;
 
 public class ServerMain {
 
+    public static InetAddress multicastIP;
+    public static int multicastPort;
+
     public static void main(String[] args) {
 
         ServerConfigurationParser configurationParser = new ServerConfigurationParser();
         configurationParser.parseConfiguration();
+
+        multicastIP = configurationParser.getMulticastIP();
+        multicastPort = configurationParser.getMulticastPort();
 
         String[] statePaths = new String[]{ configurationParser.getUsersDirPath(),
                                             configurationParser.getUsersNetworkDirPath(),
@@ -39,7 +48,7 @@ public class ServerMain {
         StateWriter stateWriter = new StateWriter(statePaths);
         timer.scheduleAtFixedRate(stateWriter, 1000, 10000);
 
-        ServerShutdownHook shutdownHook = new ServerShutdownHook(tcpConnectionsManager, timer, stateWriter);
+        ServerShutdownHook shutdownHook = new ServerShutdownHook(tcpConnectionsManager, timer, stateWriter, rewardsCalculator);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         tcpConnectionsManager.select();

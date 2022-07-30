@@ -12,13 +12,6 @@ public class ClientConfigurationParser extends ConfigurationParser {
 
         host = "localhost";
         tcpPort = 8001;
-        try {
-            multicastIP = InetAddress.getByName("239.255.32.32");
-        } catch (UnknownHostException e) {
-            e.printStackTrace(System.err);
-            throw new RuntimeException("default multicast host not found");
-        }
-        multicastPort = 8002;
         rmiCallbackName = "FollowersServerNotification";
         rmiCallbackPort = 8003;
         registerName = "RegistrationWinsomeServer";
@@ -43,8 +36,7 @@ public class ClientConfigurationParser extends ConfigurationParser {
             }
             host = map.get("host");
             tcpPort = Integer.parseInt(map.get("tcp_port"));
-            multicastIP = InetAddress.getByName(map.get("multicast_IP"));
-            multicastPort = Integer.parseInt(map.get("multicast_port"));
+            multicastPort = Integer.parseInt((map.get("multicast_port")));
             rmiCallbackName = map.get("RMI_callback_name");
             rmiCallbackPort = Integer.parseInt(map.get("RMI_callback_port"));
             registerName = map.get("register_name");

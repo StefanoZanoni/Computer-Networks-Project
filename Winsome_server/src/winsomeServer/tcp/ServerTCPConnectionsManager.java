@@ -1,5 +1,6 @@
 package winsomeServer.tcp;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -11,9 +12,10 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ServerTCPConnectionsManager {
+public class ServerTCPConnectionsManager implements Closeable {
 
     private boolean end = false;
+    private boolean closed = false;
     ExecutorService threadPool;
     Selector selector;
     ServerSocketChannel socketChannel;
@@ -42,6 +44,8 @@ public class ServerTCPConnectionsManager {
 
         while (true) {
 
+            // wakeup prevents the select from block and not throw
+            // ClosedSocketException if it is closed
             if (!end)
                 selector.wakeup();
             else break;
@@ -124,7 +128,10 @@ public class ServerTCPConnectionsManager {
 
     }
 
-    public void close() {
+    public boolean isClosed() { return closed; }
+
+    @Override
+    public void close() throws IOException {
 
         end = true;
 
@@ -147,6 +154,7 @@ public class ServerTCPConnectionsManager {
         for (SelectionKey key : selector.keys()) {
             try {
                 key.channel().close();
+                key.cancel();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -157,6 +165,8 @@ public class ServerTCPConnectionsManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        closed = true;
 
     }
 

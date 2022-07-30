@@ -44,12 +44,16 @@ public final class Post {
     private final List<String> downvotes = Collections.synchronizedList( new LinkedList<>() );
     private final List<Comment> comments = Collections.synchronizedList( new LinkedList<>() );
 
-    public Post(String owner, String title, String content) {
+    public Post(String owner, String title, String content, int idOffset) {
 
         if (owner == null || title == null || content == null)
             throw new NullPointerException();
 
-        ID = IDCounter.getAndIncrement();
+        int tempID = IDCounter.getAndIncrement();
+        if (tempID > 1000 && idOffset != 0)
+            ID = tempID + idOffset - 1;
+        else
+            ID = tempID + idOffset;
         this.owner = owner;
         this.title = title;
         this.content = content;

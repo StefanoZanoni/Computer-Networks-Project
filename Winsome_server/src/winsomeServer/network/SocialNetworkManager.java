@@ -14,22 +14,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SocialNetworkManager {
 
     // client -> user
-    static final ConcurrentHashMap<SocketChannel, String> connections = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<SocketChannel, String> connections = new ConcurrentHashMap<>();
 
     // username -> user: this is the list of all users in Winsome
-    static ConcurrentHashMap<String, User> users;
+    public static ConcurrentHashMap<String, User> users;
 
     // tag -> list users: for each tag this hashmap stores the list of users having that tag
-    static ConcurrentHashMap<String, List<String>> tagsNetwork;
+    public static ConcurrentHashMap<String, List<String>> tagsNetwork;
 
     // user -> followed
-    static ConcurrentHashMap<String, List<String>> usersNetwork;
+    public static ConcurrentHashMap<String, List<String>> usersNetwork;
 
     // user -> posts
-    static ConcurrentHashMap<String, List<Integer>> postsNetwork;
+    public static ConcurrentHashMap<String, List<Integer>> postsNetwork;
 
     // id -> post
-    static ConcurrentHashMap<Integer, Post> posts;
+    public static ConcurrentHashMap<Integer, Post> posts;
 
     public static void uncouple(SocketChannel client) throws UserNotYetLoggedInException {
 
@@ -201,7 +201,7 @@ public class SocialNetworkManager {
         if (username == null)
             throw new UserNotYetLoggedInException();
 
-        Post newPost = new Post(username, title, content);
+        Post newPost = new Post(username, title, content, posts.keySet().size());
         int ID = newPost.getID();
         posts.put(ID, newPost);
         postsNetwork.get(username).add(ID);

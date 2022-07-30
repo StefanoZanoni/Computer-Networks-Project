@@ -2,6 +2,7 @@ package winsomeClient.tcp;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import winsomeClient.ClientMain;
 import winsomeClient.commands.UnknownCommandException;
 import winsome.base.Post;
 import winsome.base.Wallet;
@@ -55,10 +56,15 @@ public class ClientTCPConnectionManager {
                     case "register" -> {
                         register(arguments.get(0), arguments.get(1),
                                 arguments.subList(2, arguments.size()));
-                        receive();
+                        receiveReferences();
                     }
 
-                    case "login", "post" -> {
+                    case "login" -> {
+                        send(command, arguments.get(0), arguments.get(1));
+                        receiveReferences();
+                    }
+
+                    case "post" -> {
                         send(command, arguments.get(0), arguments.get(1));
                         receive();
                     }
@@ -157,6 +163,51 @@ public class ClientTCPConnectionManager {
             socketChannel.write(buffer);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+    }
+
+    private void receiveReferences() {
+
+        int bufferCapacity = Integer.BYTES;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
+        try {
+            socketChannel.read(buffer);
+            buffer.flip();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        bufferCapacity = buffer.getInt();
+
+        if (bufferCapacity == Integer.BYTES) {
+
+            try {
+                buffer.clear();
+                socketChannel.read(buffer);
+                buffer.flip();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NetError error = NetError.valueOf(buffer.getInt());
+            error.showError();
+
+        }
+        else {
+
+            buffer = ByteBuffer.allocate(bufferCapacity);
+            try {
+                socketChannel.read(buffer);
+                buffer.flip();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
+            String[] references = outcome.split("\\|");
+            Gson gson = new Gson();
+            Type inetAddress = new TypeToken<InetAddress>() {}.getType();
+            ClientMain.multicastIP = gson.fromJson(references[0], inetAddress);
+            ClientMain.multicastServerPort = Integer.parseInt(references[1]);
+
         }
 
     }

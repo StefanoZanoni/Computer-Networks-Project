@@ -1,11 +1,18 @@
 package winsomeServer.network;
 
 import winsome.base.Post;
+import winsomeServer.ServerMain;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.MulticastSocket;
+import java.nio.ByteBuffer;
 import java.util.*;
 
-public class RewardsCalculator extends TimerTask {
+public class RewardsCalculator extends TimerTask implements Closeable {
 
+    private boolean closed = false;
     /*
         int[0] : numberOfPreviousUpvotes
         int[1] : numberOfPreviousDownvotes
@@ -14,16 +21,50 @@ public class RewardsCalculator extends TimerTask {
     */
     private final HashMap<Post, int[]> previousStatistics = new HashMap<>();
     private final float authorEarnPercentage;
+    private final MulticastSocket multicastSocket;
+    private final DatagramPacket datagramPacket;
 
-    public RewardsCalculator(float authorEarnPercentage1) { this.authorEarnPercentage = authorEarnPercentage1; }
+    public RewardsCalculator(float authorEarnPercentage) {
+
+        this.authorEarnPercentage = authorEarnPercentage;
+
+        byte[] data;
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.putInt(1);
+        data = buffer.array();
+        datagramPacket = new DatagramPacket(data, data.length,
+                ServerMain.multicastIP, ServerMain.multicastPort);
+
+        try {
+            multicastSocket = new MulticastSocket(ServerMain.multicastPort);
+            multicastSocket.setTimeToLive(1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
 
     @Override
     public void run() {
 
+        if (computeReward() != 0)
+            try {
+                multicastSocket.send(datagramPacket);
+                System.out.println("sent");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+    }
+
+    private float computeReward() {
+
+        float reward = 0;
+
         for (Post post : SocialNetworkManager.posts.values()) {
 
             String author = post.getOwner();
-            float reward;
             int[] statistics = previousStatistics.putIfAbsent( post, new int[]{0, 0, 0, 1} );
             if (statistics != null)
                 reward = post.computeReward(statistics[0], statistics[1], statistics[2], statistics[3]);
@@ -59,6 +100,12 @@ public class RewardsCalculator extends TimerTask {
 
         }
 
+        return reward;
+
     }
+
+    public boolean isClosed() { return closed; }
+    @Override
+    public void close() throws IOException { multicastSocket.close(); closed = true; }
 
 }

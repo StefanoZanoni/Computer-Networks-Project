@@ -1,10 +1,18 @@
+package winsomeClient;
+
 import winsomeClient.commands.CommandParser;
 import winsomeClient.commands.UnknownCommandException;
 import winsome.config.ClientConfigurationParser;
+import winsomeClient.multicast.MulticastManager;
 import winsomeClient.shutdown.ClientShutdownHook;
 import winsomeClient.tcp.ClientTCPConnectionManager;
 
+import java.net.InetAddress;
+
 public class ClientMain {
+
+    public static InetAddress multicastIP;
+    public static int multicastServerPort;
 
     public static void main(String[] args) {
 
@@ -33,6 +41,13 @@ public class ClientMain {
             }
             command = commandParser.getCommand();
             tcpConnectionManager.interact(command, commandParser.getArguments());
+            if (command.compareTo("register") == 0 || command.compareTo("login") == 0) {
+                MulticastManager manager = new MulticastManager(configurationParser.getMulticastPort());
+                shutdownHook.setMulticastManager(manager);
+                Thread multicastManager = new Thread(manager);
+                multicastManager.start();
+                System.out.println("< Operation completed successfully");
+            }
 
         } while(command.compareTo("logout") != 0);
 
