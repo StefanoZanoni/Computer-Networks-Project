@@ -11,6 +11,7 @@ public class ClientShutdownHook extends Thread {
     private final ClientTCPConnectionManager clientTCPConnectionManager;
     private final CommandParser commandParser;
     private MulticastManager multicastManager;
+    private Thread multicastManagerThread;
     private boolean correctTermination = false;
 
     public ClientShutdownHook(ClientTCPConnectionManager clientTCPConnectionManager, CommandParser commandParser) {
@@ -21,6 +22,7 @@ public class ClientShutdownHook extends Thread {
     }
 
     public void setMulticastManager(MulticastManager multicastManager){ this.multicastManager = multicastManager; }
+    public void setMulticastManagerThread(Thread multicastManagerThread) { this.multicastManagerThread = multicastManagerThread; }
 
     public void run() {
 
@@ -30,6 +32,11 @@ public class ClientShutdownHook extends Thread {
         clientTCPConnectionManager.close();
         commandParser.close();
         multicastManager.shutdown();
+        try {
+            multicastManagerThread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

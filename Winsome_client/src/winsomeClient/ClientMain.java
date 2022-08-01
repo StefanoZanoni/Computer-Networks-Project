@@ -42,16 +42,19 @@ public class ClientMain {
             command = commandParser.getCommand();
             tcpConnectionManager.interact(command, commandParser.getArguments());
             if (command.compareTo("register") == 0 || command.compareTo("login") == 0) {
-                MulticastManager manager = new MulticastManager(configurationParser.getMulticastPort());
-                shutdownHook.setMulticastManager(manager);
-                Thread multicastManager = new Thread(manager);
-                multicastManager.start();
+                MulticastManager multicastManager = new MulticastManager(configurationParser.getMulticastPort());
+                shutdownHook.setMulticastManager(multicastManager);
+                Thread multicastManagerThread = new Thread(multicastManager);
+                shutdownHook.setMulticastManagerThread(multicastManagerThread);
+                multicastManagerThread.start();
                 System.out.println("< Operation completed successfully");
             }
 
         } while(command.compareTo("logout") != 0);
 
         shutdownHook.setCorrectTermination(true);
+
+        System.exit(0);
 
     }
 
