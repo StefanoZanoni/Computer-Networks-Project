@@ -12,7 +12,8 @@ import java.net.InetAddress;
 public class ClientMain {
 
     public static InetAddress multicastIP;
-    public static int multicastServerPort;
+    public static int multicastPort;
+    public static boolean correctIdentification = true;
 
     public static void main(String[] args) {
 
@@ -41,13 +42,17 @@ public class ClientMain {
             }
             command = commandParser.getCommand();
             tcpConnectionManager.interact(command, commandParser.getArguments());
-            if (command.compareTo("register") == 0 || command.compareTo("login") == 0) {
-                MulticastManager multicastManager = new MulticastManager(configurationParser.getMulticastPort());
+
+            if ( (command.compareTo("register") == 0 || command.compareTo("login") == 0)
+                    && correctIdentification) {
+
+                MulticastManager multicastManager = new MulticastManager();
                 shutdownHook.setMulticastManager(multicastManager);
                 Thread multicastManagerThread = new Thread(multicastManager);
                 shutdownHook.setMulticastManagerThread(multicastManagerThread);
                 multicastManagerThread.start();
                 System.out.println("< Operation completed successfully");
+
             }
 
         } while(command.compareTo("logout") != 0);

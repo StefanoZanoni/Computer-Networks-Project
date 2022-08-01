@@ -5,8 +5,7 @@ import winsomeServer.ServerMain;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -23,25 +22,32 @@ public class RewardsCalculator extends TimerTask implements Closeable {
     private final float authorEarnPercentage;
     private final MulticastSocket multicastSocket;
     private final DatagramPacket datagramPacket;
+    private final InetSocketAddress group;
+    private final NetworkInterface networkInterface;
 
     public RewardsCalculator(float authorEarnPercentage) {
 
         this.authorEarnPercentage = authorEarnPercentage;
 
-        byte[] data;
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.putInt(1);
-        data = buffer.array();
-        datagramPacket = new DatagramPacket(data, data.length,
-                ServerMain.multicastIP, ServerMain.multicastPort);
+        group = new InetSocketAddress(ServerMain.multicastIP, ServerMain.multicastPort);
+        try {
+            networkInterface = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
+        } catch (SocketException | UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
 
         try {
             multicastSocket = new MulticastSocket(ServerMain.multicastPort);
-            multicastSocket.setTimeToLive(1);
+            multicastSocket.setReuseAddress(true);
+            multicastSocket.joinGroup(group, networkInterface);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
+        byte[] data;
+        ByteBuffer byteBuffer = ByteBuffer.allocate(Integer.BYTES);
+        data = byteBuffer.array();
+        datagramPacket = new DatagramPacket(data, data.length, ServerMain.multicastIP, ServerMain.multicastPort);
 
     }
 
@@ -51,7 +57,6 @@ public class RewardsCalculator extends TimerTask implements Closeable {
         if (computeReward() != 0)
             try {
                 multicastSocket.send(datagramPacket);
-                System.out.println("sent");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -105,7 +110,14 @@ public class RewardsCalculator extends TimerTask implements Closeable {
     }
 
     public boolean isClosed() { return closed; }
+
     @Override
-    public void close() throws IOException { multicastSocket.close(); closed = true; }
+    public void close() throws IOException {
+
+        multicastSocket.leaveGroup(group, networkInterface);
+        multicastSocket.close();
+        closed = true;
+
+    }
 
 }

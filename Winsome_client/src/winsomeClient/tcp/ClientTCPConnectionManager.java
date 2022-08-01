@@ -190,6 +190,7 @@ public class ClientTCPConnectionManager {
             }
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
+            ClientMain.correctIdentification = false;
 
         }
         else {
@@ -206,7 +207,7 @@ public class ClientTCPConnectionManager {
             Gson gson = new Gson();
             Type inetAddress = new TypeToken<InetAddress>() {}.getType();
             ClientMain.multicastIP = gson.fromJson(references[0], inetAddress);
-            ClientMain.multicastServerPort = Integer.parseInt(references[1]);
+            ClientMain.multicastPort = Integer.parseInt(references[1]);
 
         }
 

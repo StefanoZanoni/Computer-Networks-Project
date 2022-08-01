@@ -10,26 +10,29 @@ public class MulticastManager implements Runnable {
     private volatile boolean shutdown = false;
     private final DatagramPacket datagramPacket;
     private final MulticastSocket multicastSocket;
+    private final InetSocketAddress group;
+    private final NetworkInterface networkInterface;
 
-    public MulticastManager(int multicastLocalPort) {
+    public MulticastManager() {
 
         byte[] buffer = new byte[Integer.BYTES];
         datagramPacket = new DatagramPacket(buffer, buffer.length);
 
-        InetSocketAddress socketAddress = new InetSocketAddress(ClientMain.multicastIP, ClientMain.multicastServerPort);
-        NetworkInterface networkInterface;
+        group = new InetSocketAddress(ClientMain.multicastIP, ClientMain.multicastPort);
         try {
             networkInterface = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
         } catch (SocketException | UnknownHostException e) {
             throw new RuntimeException(e);
         }
+
         try {
-            multicastSocket = new MulticastSocket(multicastLocalPort);
+            multicastSocket = new MulticastSocket(ClientMain.multicastPort);
             multicastSocket.setReuseAddress(true);
-            multicastSocket.joinGroup(socketAddress, networkInterface);
+            multicastSocket.joinGroup(group, networkInterface);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     @Override
@@ -52,8 +55,15 @@ public class MulticastManager implements Runnable {
     }
 
     public void shutdown() {
+
         shutdown = true;
+        try {
+            multicastSocket.leaveGroup(group, networkInterface);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         multicastSocket.close();
+
     }
 
 }

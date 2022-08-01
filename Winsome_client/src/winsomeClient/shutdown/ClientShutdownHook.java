@@ -1,5 +1,6 @@
 package winsomeClient.shutdown;
 
+import winsomeClient.ClientMain;
 import winsomeClient.commands.CommandParser;
 import winsomeClient.multicast.MulticastManager;
 import winsomeClient.tcp.ClientTCPConnectionManager;
@@ -26,7 +27,7 @@ public class ClientShutdownHook extends Thread {
 
     public void run() {
 
-        if (!correctTermination)
+        if (!correctTermination && ClientMain.correctIdentification)
             clientTCPConnectionManager.interact("logout", Collections.emptyList());
 
         clientTCPConnectionManager.close();
