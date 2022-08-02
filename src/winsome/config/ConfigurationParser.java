@@ -5,14 +5,15 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *  This class is used to parse the configuration file of both client and server.
+ *  The method parseConfiguration check for all fields for validation and in case of invalid or not present
+ *  data load the default configuration.
+ */
 public abstract class ConfigurationParser {
 
-    protected String host;
+    protected InetAddress host;
     protected int tcpPort;
-    protected InetAddress multicastIP;
-    protected int multicastPort;
-    protected String rmiCallbackName;
-    protected int rmiCallbackPort;
 
     protected Map<String, String> map = new HashMap<>();
 

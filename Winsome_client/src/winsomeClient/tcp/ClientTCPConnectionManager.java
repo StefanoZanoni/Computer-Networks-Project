@@ -35,7 +35,7 @@ public class ClientTCPConnectionManager {
 
     }
 
-    public void establishConnection(String host, int port) {
+    public void establishConnection(InetAddress host, int port) {
 
         try {
             socketChannel.connect(new InetSocketAddress(host, port));

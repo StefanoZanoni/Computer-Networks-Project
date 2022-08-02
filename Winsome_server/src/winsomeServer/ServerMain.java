@@ -1,6 +1,6 @@
 package winsomeServer;
 
-import winsome.config.ServerConfigurationParser;
+import winsomeServer.config.ServerConfigurationParser;
 import winsomeServer.network.RewardsCalculator;
 import winsomeServer.network.SocialNetworkManager;
 import winsomeServer.network.StateLoader;

@@ -16,6 +16,9 @@ public final class Post {
 
         private Comment(String author, String text) {
 
+            if (author == null || text == null)
+                throw new NullPointerException();
+
             this.author = author;
             this.text = text;
             timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(Calendar.getInstance().getTime());
@@ -112,7 +115,7 @@ public final class Post {
      * @param numberOfPreviousComments  the number of previous comments that is stored by the server
      * @param age                       the number of times the reward was computed
      * @return the computed reward for this post
-     *
+     * <p>
      * Since a user cannot upvote or downvote two times the same post and
      * upvote and downvote can only assume the value +1 and -1 respectively, the first summation
      * inside the first log is well-defined
@@ -120,8 +123,14 @@ public final class Post {
     public float computeReward(int numberOfPreviousUpvotes, int numberOfPreviousDownvotes,
                                int numberOfPreviousComments, int age) {
 
-        return (float) (( log(max((upvotes.size() - numberOfPreviousUpvotes - (downvotes.size() - numberOfPreviousDownvotes)), 0) + 1 )
-                + log( (computeCommentsValue(numberOfPreviousComments)) + 1) ) / age);
+        return (float) (    (
+                                log( max( (upvotes.size() - numberOfPreviousUpvotes -
+                                    (downvotes.size() - numberOfPreviousDownvotes)), 0 ) + 1 )
+                                        +
+                                log( (computeCommentsValue(numberOfPreviousComments)) + 1)
+                            )
+                            / age
+                        );
 
     }
 
@@ -152,7 +161,9 @@ public final class Post {
 
         if (!comments.isEmpty()) {
 
-            for ( Comment comment : comments.subList( numberOfPreviousComments, comments.size() ) ) {
+            List<Comment> newComments = comments.subList(numberOfPreviousComments, comments.size());
+
+            for ( Comment comment : newComments ) {
 
                 String author = comment.getAuthor();
                 UserCounter userCounter = peopleChecked.get(author);
@@ -163,7 +174,7 @@ public final class Post {
 
             }
 
-            for ( Comment comment : comments.subList( numberOfPreviousComments, comments.size() ) ) {
+            for ( Comment comment : newComments ) {
 
                 String author = comment.getAuthor();
                 commentsValue += ( 2 / ( 1 + exp( 1 - peopleChecked.get(author).getValue() ) ) );

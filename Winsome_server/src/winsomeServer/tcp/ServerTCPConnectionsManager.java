@@ -2,6 +2,7 @@ package winsomeServer.tcp;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
@@ -20,7 +21,7 @@ public class ServerTCPConnectionsManager implements Closeable {
     Selector selector;
     ServerSocketChannel socketChannel;
 
-    public ServerTCPConnectionsManager(ExecutorService threadPool, String host, int port) {
+    public ServerTCPConnectionsManager(ExecutorService threadPool, InetAddress host, int port) {
 
         this.threadPool = threadPool;
 

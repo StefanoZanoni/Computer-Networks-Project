@@ -2,7 +2,7 @@ package winsomeClient;
 
 import winsomeClient.commands.CommandParser;
 import winsomeClient.commands.UnknownCommandException;
-import winsome.config.ClientConfigurationParser;
+import winsomeClient.config.ClientConfigurationParser;
 import winsomeClient.multicast.MulticastManager;
 import winsomeClient.rmi.ClientRMIManger;
 import winsomeClient.shutdown.ClientShutdownHook;

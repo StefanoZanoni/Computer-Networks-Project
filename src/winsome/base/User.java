@@ -7,7 +7,7 @@ public final class User {
     private final String username;
     private final char[] password;
     private final List<String> tags;
-    private final Wallet wallet = new Wallet();
+    private final Wallet wallet;
 
     public User(String username, char[] password, List<String> tags) {
 
@@ -17,6 +17,7 @@ public final class User {
         this.username = username;
         this.password = password.clone();
         this.tags = tags;
+        wallet = new Wallet();
 
     }
 
@@ -24,7 +25,6 @@ public final class User {
     public char[] getPassword() { return password; }
     public List<String> getTags() { return tags; }
     public Wallet getWallet() { return wallet; }
-
 
     @Override
     public String toString() {
