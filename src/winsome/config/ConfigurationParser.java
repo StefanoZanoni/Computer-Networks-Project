@@ -13,8 +13,7 @@ public abstract class ConfigurationParser {
     protected int multicastPort;
     protected String rmiCallbackName;
     protected int rmiCallbackPort;
-    protected String registerName;
-    protected int registerPort;
+
     protected Map<String, String> map = new HashMap<>();
 
     public abstract void parseConfiguration() throws IOException;

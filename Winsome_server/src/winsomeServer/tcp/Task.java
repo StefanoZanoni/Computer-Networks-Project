@@ -49,7 +49,8 @@ public enum Task implements Runnable {
                 SocialNetworkManager.addUser(client, username, password, tempTags);
                 Gson gson = new Gson();
                 String jsonMulticastAddress = gson.toJson(ServerMain.multicastIP);
-                String outcome = jsonMulticastAddress + "|" + ServerMain.multicastPort;
+                String outcome = jsonMulticastAddress + "|" + ServerMain.multicastPort + "|"
+                                    + ServerMain.rmiCallbackName + "|" + ServerMain.rmiCallbackPort;
                 bufferCapacity = outcome.length();
                 buffer.putInt(bufferCapacity);
                 try {
@@ -110,7 +111,8 @@ public enum Task implements Runnable {
                 SocialNetworkManager.checkUser(client, username, password);
                 Gson gson = new Gson();
                 String jsonMulticastAddress = gson.toJson(ServerMain.multicastIP);
-                String outcome = jsonMulticastAddress + "|" + ServerMain.multicastPort;
+                String outcome = jsonMulticastAddress + "|" + ServerMain.multicastPort + "|"
+                                + ServerMain.rmiCallbackName + "|" + ServerMain.rmiCallbackPort;
                 bufferCapacity = outcome.length();
                 buffer.putInt(bufferCapacity);
                 try {

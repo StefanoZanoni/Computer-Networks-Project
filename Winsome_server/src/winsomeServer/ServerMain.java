@@ -2,8 +2,10 @@ package winsomeServer;
 
 import winsome.config.ServerConfigurationParser;
 import winsomeServer.network.RewardsCalculator;
+import winsomeServer.network.SocialNetworkManager;
 import winsomeServer.network.StateLoader;
 import winsomeServer.network.StateWriter;
+import winsomeServer.rmi.ServerRMIManager;
 import winsomeServer.shutdown.ServerShutdownHook;
 import winsomeServer.tcp.ServerTCPConnectionsManager;
 
@@ -16,6 +18,9 @@ public class ServerMain {
     public static InetAddress multicastIP;
     public static int multicastPort;
 
+    public static String rmiCallbackName;
+    public static int rmiCallbackPort;
+
     public static void main(String[] args) {
 
         ServerConfigurationParser configurationParser = new ServerConfigurationParser();
@@ -23,6 +28,12 @@ public class ServerMain {
 
         multicastIP = configurationParser.getMulticastIP();
         multicastPort = configurationParser.getMulticastPort();
+        rmiCallbackName = configurationParser.getRmiCallbackName();
+        rmiCallbackPort = configurationParser.getRmiCallbackPort();
+
+        ServerRMIManager rmiManager = new ServerRMIManager();
+        rmiManager.createRegistry();
+        SocialNetworkManager.rmiManager = rmiManager;
 
         String[] statePaths = new String[]{ configurationParser.getUsersDirPath(),
                                             configurationParser.getUsersNetworkDirPath(),
@@ -48,7 +59,8 @@ public class ServerMain {
         StateWriter stateWriter = new StateWriter(statePaths);
         timer.scheduleAtFixedRate(stateWriter, 1000, 10000);
 
-        ServerShutdownHook shutdownHook = new ServerShutdownHook(tcpConnectionsManager, timer, stateWriter, rewardsCalculator);
+        ServerShutdownHook shutdownHook = new ServerShutdownHook(tcpConnectionsManager, timer,
+                                                                    stateWriter, rewardsCalculator, rmiManager);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         tcpConnectionsManager.select();

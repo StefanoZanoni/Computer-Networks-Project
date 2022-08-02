@@ -3,6 +3,7 @@ package winsomeClient.shutdown;
 import winsomeClient.ClientMain;
 import winsomeClient.commands.CommandParser;
 import winsomeClient.multicast.MulticastManager;
+import winsomeClient.rmi.ClientRMIManger;
 import winsomeClient.tcp.ClientTCPConnectionManager;
 
 import java.util.Collections;
@@ -13,6 +14,7 @@ public class ClientShutdownHook extends Thread {
     private final CommandParser commandParser;
     private MulticastManager multicastManager;
     private Thread multicastManagerThread;
+    private ClientRMIManger rmiManger;
     private boolean correctTermination = false;
 
     public ClientShutdownHook(ClientTCPConnectionManager clientTCPConnectionManager, CommandParser commandParser) {
@@ -24,6 +26,7 @@ public class ClientShutdownHook extends Thread {
 
     public void setMulticastManager(MulticastManager multicastManager){ this.multicastManager = multicastManager; }
     public void setMulticastManagerThread(Thread multicastManagerThread) { this.multicastManagerThread = multicastManagerThread; }
+    public void setRMIManager(ClientRMIManger rmiManager) { this.rmiManger = rmiManager; }
 
     public void run() {
 
@@ -38,6 +41,7 @@ public class ClientShutdownHook extends Thread {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        rmiManger.unregister();
 
     }
 

@@ -35,8 +35,6 @@ public class ServerConfigurationParser extends ConfigurationParser {
         multicastPort = 6002;
         rmiCallbackName = "FollowersServerNotification";
         rmiCallbackPort = 6003;
-        registerName = "RegistrationWinsomeServer";
-        registerPort = 6004;
         corePoolSize = 8;
         maximumPoolSize = 64;
         keepAliveTime = 20000;
@@ -79,8 +77,6 @@ public class ServerConfigurationParser extends ConfigurationParser {
             multicastPort = Integer.parseInt(map.get("multicast_port"));
             rmiCallbackName = map.get("RMI_callback_name");
             rmiCallbackPort = Integer.parseInt(map.get("RMI_callback_port"));
-            registerName = map.get("register_name");
-            registerPort = Integer.parseInt(map.get("register_port"));
             corePoolSize = Integer.parseInt(map.get("corePoolSize"));
             maximumPoolSize = Integer.parseInt(map.get("maximumPoolSize"));
             keepAliveTime = Integer.parseInt(map.get("keepAliveTime"));
@@ -107,10 +103,8 @@ public class ServerConfigurationParser extends ConfigurationParser {
     }
 
     public String getRmiCallbackName() { return rmiCallbackName; }
-    public String getRegisterName() { return registerName; }
     public int getTcpPort() { return tcpPort; }
     public int getRmiCallbackPort() { return rmiCallbackPort; }
-    public int getRegisterPort() { return registerPort; }
     public int getMulticastPort() { return multicastPort; }
     public String getHost() { return host; }
     public float getAuthorEarnPercentage() { return authorEarnPercentage; }

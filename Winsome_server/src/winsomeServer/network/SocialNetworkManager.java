@@ -4,6 +4,7 @@ import winsome.base.Post;
 import winsome.base.User;
 import winsome.base.Wallet;
 import winsome.net.exceptions.*;
+import winsomeServer.rmi.ServerRMIManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,6 +31,8 @@ public class SocialNetworkManager {
 
     // id -> post
     public static ConcurrentHashMap<Integer, Post> posts;
+
+    public static ServerRMIManager rmiManager;
 
     public static void uncouple(SocketChannel client) throws UserNotYetLoggedInException {
 
@@ -156,6 +159,7 @@ public class SocialNetworkManager {
         if (!followed.contains(username))
             followed.add(username);
 
+        rmiManager.update(username, user, true);
 
     }
 
@@ -172,6 +176,8 @@ public class SocialNetworkManager {
             throw new UserNotFollowedException();
 
         usersNetwork.get(user).remove(username);
+
+        rmiManager.update(username, user, false);
 
     }
 

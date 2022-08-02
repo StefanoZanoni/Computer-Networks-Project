@@ -1,8 +1,6 @@
 package winsome.config;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -14,8 +12,6 @@ public class ClientConfigurationParser extends ConfigurationParser {
         tcpPort = 8001;
         rmiCallbackName = "FollowersServerNotification";
         rmiCallbackPort = 8003;
-        registerName = "RegistrationWinsomeServer";
-        registerPort = 8004;
 
     }
 
@@ -36,11 +32,8 @@ public class ClientConfigurationParser extends ConfigurationParser {
             }
             host = map.get("host");
             tcpPort = Integer.parseInt(map.get("tcp_port"));
-            multicastPort = Integer.parseInt((map.get("multicast_port")));
             rmiCallbackName = map.get("RMI_callback_name");
             rmiCallbackPort = Integer.parseInt(map.get("RMI_callback_port"));
-            registerName = map.get("register_name");
-            registerPort = Integer.parseInt(map.get("register_port"));
 
         }
         catch (FileNotFoundException e) {
@@ -55,18 +48,6 @@ public class ClientConfigurationParser extends ConfigurationParser {
 
     public String getHost() { return host; }
 
-    public int getMulticastPort() { return multicastPort; }
-
-    public int getRegisterPort() { return registerPort; }
-
-    public int getRmiCallbackPort() { return rmiCallbackPort; }
-
     public int getTcpPort() { return tcpPort; }
-
-    public String getRegisterName() { return registerName; }
-
-    public String getRmiCallbackName() { return rmiCallbackName; }
-
-    public InetAddress getMulticastIP() { return multicastIP; }
 
 }

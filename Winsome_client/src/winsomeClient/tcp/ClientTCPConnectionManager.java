@@ -79,8 +79,6 @@ public class ClientTCPConnectionManager {
                         receiveUsers();
                     }
 
-                    case "list followers" -> {}
-
                     case "blog", "show feed" -> {
                         send(command);
                         receivePosts();
@@ -208,6 +206,8 @@ public class ClientTCPConnectionManager {
             Type inetAddress = new TypeToken<InetAddress>() {}.getType();
             ClientMain.multicastIP = gson.fromJson(references[0], inetAddress);
             ClientMain.multicastPort = Integer.parseInt(references[1]);
+            ClientMain.rmiCallbackName = references[2];
+            ClientMain.rmiCallbackPort = Integer.parseInt(references[3]);
 
         }
 

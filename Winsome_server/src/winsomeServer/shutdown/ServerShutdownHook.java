@@ -2,6 +2,7 @@ package winsomeServer.shutdown;
 
 import winsomeServer.network.RewardsCalculator;
 import winsomeServer.network.StateWriter;
+import winsomeServer.rmi.ServerRMIManager;
 import winsomeServer.tcp.ServerTCPConnectionsManager;
 
 import java.io.IOException;
@@ -13,14 +14,17 @@ public class ServerShutdownHook extends Thread {
     private final Timer timer;
     private final StateWriter stateWriter;
     private final RewardsCalculator rewardsCalculator;
+    private final ServerRMIManager rmiManager;
 
     public ServerShutdownHook(ServerTCPConnectionsManager tcpConnectionsManager,
-                              Timer timer, StateWriter stateWriter, RewardsCalculator rewardsCalculator) {
+                              Timer timer, StateWriter stateWriter,
+                              RewardsCalculator rewardsCalculator, ServerRMIManager rmiManager) {
 
         this.tcpConnectionsManager = tcpConnectionsManager;
         this.timer = timer;
         this.stateWriter = stateWriter;
         this.rewardsCalculator = rewardsCalculator;
+        this.rmiManager = rmiManager;
     }
 
     @Override
@@ -38,6 +42,7 @@ public class ServerShutdownHook extends Thread {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        rmiManager.unbind();
 
     }
 
