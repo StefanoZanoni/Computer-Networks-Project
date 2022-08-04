@@ -208,6 +208,7 @@ public class ClientTCPConnectionManager {
             ClientMain.multicastPort = Integer.parseInt(references[1]);
             ClientMain.rmiCallbackName = references[2];
             ClientMain.rmiCallbackPort = Integer.parseInt(references[3]);
+            ClientMain.correctIdentification = true;
 
         }
 

@@ -18,7 +18,7 @@ public class ClientMain {
     public static int multicastPort;
     public static String rmiCallbackName;
     public static int rmiCallbackPort;
-    public static boolean correctIdentification = true;
+    public static boolean correctIdentification = false;
     public static List<String> followers = new ArrayList<>();
 
     public static void main(String[] args) {
