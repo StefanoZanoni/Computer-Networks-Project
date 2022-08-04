@@ -26,14 +26,15 @@ public class ClientMain {
         ClientConfigurationParser configurationParser = new ClientConfigurationParser();
         configurationParser.parseConfiguration();
 
+        CommandParser commandParser = new CommandParser();
+
         ClientTCPConnectionManager tcpConnectionManager = new ClientTCPConnectionManager();
         tcpConnectionManager.establishConnection(configurationParser.getHost(), configurationParser.getTcpPort());
 
-        CommandParser commandParser = new CommandParser();
-        String command = "valid";
-
         ClientShutdownHook shutdownHook = new ClientShutdownHook(tcpConnectionManager, commandParser);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+        String command = "valid";
 
         do {
 
