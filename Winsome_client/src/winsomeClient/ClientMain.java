@@ -19,6 +19,7 @@ public class ClientMain {
     public static String rmiCallbackName;
     public static int rmiCallbackPort;
     public static boolean correctIdentification = false;
+    public static boolean error = false;
     public static List<String> followers = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -38,13 +39,18 @@ public class ClientMain {
 
         do {
 
+            if (!error)
+                System.out.print("> ");
+
             try {
                 commandParser.parse();
             } catch (IllegalArgumentException e) {
-                System.err.println("The number of inserted arguments is not valid");
+                System.err.println(e.getMessage());
                 continue;
             } catch (UnknownCommandException e) {
-                System.err.println("This is not a valid command");
+                System.err.println("< This is not a valid command");
+                System.out.print("> ");
+                error = true;
                 continue;
             }
 

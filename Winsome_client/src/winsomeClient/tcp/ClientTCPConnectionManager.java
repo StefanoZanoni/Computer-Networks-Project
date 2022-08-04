@@ -189,6 +189,7 @@ public class ClientTCPConnectionManager {
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
             ClientMain.correctIdentification = false;
+            ClientMain.error = true;
 
         }
         else {
@@ -209,6 +210,7 @@ public class ClientTCPConnectionManager {
             ClientMain.rmiCallbackName = references[2];
             ClientMain.rmiCallbackPort = Integer.parseInt(references[3]);
             ClientMain.correctIdentification = true;
+            ClientMain.error = false;
 
         }
 
@@ -225,11 +227,14 @@ public class ClientTCPConnectionManager {
             throw new RuntimeException(e);
         }
         int outcome = buffer.getInt();
-        if (outcome >= 1000)
+        if (outcome >= 1000) {
             System.out.println("< Post created successfully: ID " + outcome);
+            ClientMain.error = false;
+        }
         else {
             NetError error = NetError.valueOf(outcome);
             error.showError();
+            ClientMain.error = true;
         }
 
     }
@@ -256,10 +261,12 @@ public class ClientTCPConnectionManager {
             }
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
+            ClientMain.error = true;
 
         }
         else if (bufferCapacity == 0) {
-            System.out.println("No users match the request");
+            System.out.println("< No users match the request");
+            ClientMain.error = true;
         }
         else {
 
@@ -275,13 +282,14 @@ public class ClientTCPConnectionManager {
             Gson gson = new Gson();
             Type listOfString = new TypeToken<List<String>>() {}.getType();
 
-            System.out.printf("%s %-1c %s\n", "User", ':', "Tags");
-            System.out.println("---------------------------");
+            System.out.printf("< %s %-1c %s\n", "User", ':', "Tags");
+            System.out.println("< ---------------------------");
             for (int i = 0; i < data.length; i = i + 2) {
                 String username = data[i];
                 List<String> tags = gson.fromJson(data[i + 1], listOfString);
-                System.out.println(username + ": " + tags);
+                System.out.println("< " + username + ": " + tags);
             }
+            ClientMain.error = false;
 
         }
 
@@ -309,10 +317,12 @@ public class ClientTCPConnectionManager {
             }
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
+            ClientMain.error = true;
 
         }
         else if (bufferCapacity == 0) {
-            System.out.println("No posts have been published yet");
+            System.out.println("< No posts have been published yet");
+            ClientMain.error = true;
         }
         else {
 
@@ -326,14 +336,15 @@ public class ClientTCPConnectionManager {
             String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
             String[] data = outcome.split("\\|");
 
-            System.out.printf("%s | %s | %s\n", "ID", "Author", "Title");
-            System.out.println("-------------------------------------------");
+            System.out.printf("< %s | %s | %s\n", "ID", "Author", "Title");
+            System.out.println("< -------------------------------------------");
             for (int i = 0; i < data.length; i = i + 3) {
                 int id = Integer.parseInt(data[i]);
                 String owner = data[i+1];
                 String title = data[i+2];
-                System.out.println(id + " | " + owner + " | " + title);
+                System.out.println("< " + id + " | " + owner + " | " + title);
             }
+            ClientMain.error = false;
 
         }
 
@@ -361,6 +372,7 @@ public class ClientTCPConnectionManager {
             }
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
+            ClientMain.error = true;
 
         }
         else {
@@ -376,6 +388,7 @@ public class ClientTCPConnectionManager {
             Gson gson = new Gson();
             Post post = gson.fromJson(outcome, Post.class);
             System.out.println(post);
+            ClientMain.error = false;
 
         }
 
@@ -403,6 +416,7 @@ public class ClientTCPConnectionManager {
             }
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
+            ClientMain.error = true;
 
         }
         else {
@@ -418,6 +432,7 @@ public class ClientTCPConnectionManager {
             Gson gson = new Gson();
             Wallet wallet = gson.fromJson(outcome, Wallet.class);
             System.out.println(wallet);
+            ClientMain.error = false;
 
         }
 
