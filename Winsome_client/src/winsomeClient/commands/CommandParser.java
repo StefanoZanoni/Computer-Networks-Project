@@ -4,11 +4,12 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CommandParser {
+public class CommandParser implements AutoCloseable {
 
-    String command;
-    LinkedList<String> arguments = new LinkedList<>();
-    Scanner scanner = new Scanner(System.in);
+    private boolean closed = false;
+    private String command;
+    private final LinkedList<String> arguments = new LinkedList<>();
+    private final Scanner scanner = new Scanner(System.in);
 
     public void parse() throws UnknownCommandException {
 
@@ -37,10 +38,19 @@ public class CommandParser {
 
             case "register" -> {
                 if (words.size() < 3 || words.size() > 8)
-                    throw new IllegalArgumentException("");
+                    throw new IllegalArgumentException("The number of inserted arguments is not valid\n");
             }
 
-            case "login", "post", "comment", "rate" -> {
+            case "post" -> {
+                if (words.size() != 3)
+                    throw new IllegalArgumentException("The number of inserted arguments is not valid\n");
+                if (words.get(1).length() > 20)
+                    throw new IllegalArgumentException("Title length is greater than 20 characters\n");
+                if (words.get(2).length() > 500)
+                    throw new IllegalArgumentException("Content length is greater than 500 characters\n");
+            }
+
+            case "login", "comment", "rate" -> {
                 if (words.size() != 3)
                     throw new IllegalArgumentException("The number of inserted arguments is not valid\n");
             }
@@ -70,6 +80,16 @@ public class CommandParser {
         arguments.clear();
         return temp;
     }
-    public void close() { scanner.close(); }
+
+    public boolean isClosed() { return closed; }
+    @Override
+    public void close() {
+
+        if (!isClosed())
+            scanner.close();
+
+        closed = true;
+
+    }
 
 }

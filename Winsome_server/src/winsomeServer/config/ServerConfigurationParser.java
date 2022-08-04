@@ -17,7 +17,7 @@ public class ServerConfigurationParser extends ConfigurationParser {
                                       "RMI_callback_port", "corePoolSize", "maximumPoolSize", "keepAliveTime",
                                       "taskQueueDimension", "walletUpdateTime", "authorEarnPercentage",
                                       "usersDirPath", "usersNetworkDirPath", "postsDirPath", "postsNetworkDirPath",
-                                      "tagsNetworkDirPath" };
+                                      "tagsNetworkDirPath", "removedIDsDirPath" };
 
     private InetAddress multicastIP;
     private int multicastPort;
@@ -34,6 +34,7 @@ public class ServerConfigurationParser extends ConfigurationParser {
     private String postsDirPath;
     private String postsNetworkDirPath;
     private String tagsNetworkDirPath;
+    private String removedIDsDirPath;
 
     protected void setDefault() {
 
@@ -64,6 +65,7 @@ public class ServerConfigurationParser extends ConfigurationParser {
         postsDirPath = "Winsome_server/posts/";
         postsNetworkDirPath = "Winsome_server/posts_network/";
         tagsNetworkDirPath = "Winsome_server/tags_network/";
+        removedIDsDirPath = "Winsome_server/remove_IDs/";
 
     }
 
@@ -188,6 +190,13 @@ public class ServerConfigurationParser extends ConfigurationParser {
             if (!file.isDirectory())
                 throw new InvalidConfigurationFileException("invalid tags network directory path");
 
+            removedIDsDirPath = map.get("removedIDsDirPath");
+            if (removedIDsDirPath == null)
+                throw new InvalidConfigurationFileException("removed ids directory path not present");
+            file = new File(removedIDsDirPath);
+            if (!file.isDirectory())
+                throw new InvalidConfigurationFileException("invalid removed ids directory path");
+
         }
         catch (FileNotFoundException e) {
             System.err.println("Configuration file not found. Default settings will be applied");
@@ -220,5 +229,6 @@ public class ServerConfigurationParser extends ConfigurationParser {
     public String getPostsDirPath() { return postsDirPath; }
     public String getPostsNetworkDirPath() { return postsNetworkDirPath; }
     public String getTagsNetworkDirPath() {return tagsNetworkDirPath; }
+    public String getRemovedIDsDirPath() { return removedIDsDirPath; }
 
 }

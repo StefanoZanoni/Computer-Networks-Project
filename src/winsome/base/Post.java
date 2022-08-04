@@ -2,7 +2,6 @@ package winsome.base;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Math.*;
 
@@ -37,8 +36,6 @@ public final class Post {
         public String toString() { return this.getTimestamp() + " " + this.getAuthor() + ": " + this.getText(); }
 
     }
-
-    private static final AtomicInteger IDCounter = new AtomicInteger(1000);
     private final int ID;
     private final String owner;
     private final String title;
@@ -47,42 +44,28 @@ public final class Post {
     private final List<String> downvotes = Collections.synchronizedList( new LinkedList<>() );
     private final List<Comment> comments = Collections.synchronizedList( new LinkedList<>() );
 
-    public Post(String owner, String title, String content, int idOffset) {
+    public Post(String owner, String title, String content, int ID) {
 
         if (owner == null || title == null || content == null)
             throw new NullPointerException();
+        if (ID < 0)
+            throw new IllegalArgumentException();
 
-        int tempID = IDCounter.getAndIncrement();
-        if (tempID > 1000 && idOffset != 0)
-            ID = tempID + idOffset - 1;
-        else
-            ID = tempID + idOffset;
+        this.ID = ID + 1000;
         this.owner = owner;
         this.title = title;
         this.content = content;
 
     }
 
-    public int getID() {
-        return ID;
-    }
-    public String getOwner() {
-        return owner;
-    }
-    public String getTitle() {
-        return title;
-    }
-    public String getContent() {
-        return content;
-    }
+    public int getID() { return ID; }
+    public String getOwner() { return owner; }
+    public String getTitle() { return title; }
+    public String getContent() { return content; }
     public void addUpvote(String username) { upvotes.add(username); }
     public List<String> getUpvotes() { return upvotes; }
-    public void addDownvote(String username) {
-        downvotes.add(username);
-    }
-    public List<String> getDownvotes() {
-        return downvotes;
-    }
+    public void addDownvote(String username) { downvotes.add(username); }
+    public List<String> getDownvotes() { return downvotes; }
     public void addComment(String author, String text) {
         Comment comment = new Comment(author, text);
         comments.add(comment);

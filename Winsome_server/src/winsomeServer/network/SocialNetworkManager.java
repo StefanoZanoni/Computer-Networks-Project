@@ -32,6 +32,8 @@ public class SocialNetworkManager {
     // id -> post
     public static ConcurrentHashMap<Integer, Post> posts;
 
+    public static Queue<Integer> removedIDs;
+
     public static ServerRMIManager rmiManager;
 
     public static void uncouple(SocketChannel client) throws UserNotYetLoggedInException {
@@ -207,7 +209,11 @@ public class SocialNetworkManager {
         if (username == null)
             throw new UserNotYetLoggedInException();
 
-        Post newPost = new Post(username, title, content, posts.keySet().size());
+        Post newPost;
+        if (removedIDs.isEmpty())
+            newPost = new Post(username, title, content, posts.size());
+        else
+            newPost = new Post(username, title, content, removedIDs.poll() - 1000);
         int ID = newPost.getID();
         posts.put(ID, newPost);
         postsNetwork.get(username).add(ID);
@@ -271,6 +277,7 @@ public class SocialNetworkManager {
 
         postsNetwork.get(username).remove((Integer) idPost);
         posts.remove(idPost, post);
+        removedIDs.add(idPost);
 
     }
 

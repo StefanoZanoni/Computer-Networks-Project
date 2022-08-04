@@ -17,8 +17,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class StateWriter extends TimerTask implements Runnable {
 
@@ -31,11 +33,13 @@ public class StateWriter extends TimerTask implements Runnable {
     private final String postsDirPath;
     private final String posts_networkDirPath;
     private final String tags_networkDirPath;
+    private final String removed_IDsPath;
+
     public StateWriter(String[] paths) {
 
         if (paths == null)
             throw new NullPointerException();
-        if (paths.length != 5)
+        if (paths.length != 6)
             throw new IllegalArgumentException();
 
         usersDirPath = paths[0];
@@ -43,6 +47,7 @@ public class StateWriter extends TimerTask implements Runnable {
         postsDirPath = paths[2];
         posts_networkDirPath = paths[3];
         tags_networkDirPath = paths[4];
+        removed_IDsPath = paths[5];
 
         // create directories
         Path usersDir = Paths.get(usersDirPath).toAbsolutePath();
@@ -80,6 +85,13 @@ public class StateWriter extends TimerTask implements Runnable {
             throw new RuntimeException(e);
         }
 
+        Path removedIDsDir = Paths.get(removed_IDsPath).toAbsolutePath();
+        try {
+            Files.createDirectories(removedIDsDir);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
@@ -87,31 +99,47 @@ public class StateWriter extends TimerTask implements Runnable {
 
         String usersPath = usersDirPath.concat("users.json");
         Type mapStringUser = new TypeToken<ConcurrentHashMap<String, User>>() {}.getType();
-        writeJson(usersPath, SocialNetworkManager.users, mapStringUser);
+        writeJsonMap(usersPath, SocialNetworkManager.users, mapStringUser);
 
         String usersNetworkPath = users_networkDirPath.concat("usersNetwork.json");
         Type mapStringListOfString = new TypeToken<ConcurrentHashMap<String, List<String>>>() {}.getType();
-        writeJson(usersNetworkPath, SocialNetworkManager.usersNetwork, mapStringListOfString);
+        writeJsonMap(usersNetworkPath, SocialNetworkManager.usersNetwork, mapStringListOfString);
 
         String postsPath = postsDirPath.concat("posts.json");
         Type mapIntegerPost = new TypeToken<ConcurrentHashMap<Integer, Post>>() {}.getType();
-        writeJson(postsPath, SocialNetworkManager.posts, mapIntegerPost);
+        writeJsonMap(postsPath, SocialNetworkManager.posts, mapIntegerPost);
 
         String postsNetworkPath = posts_networkDirPath.concat("postsNetwork.json");
         Type mapStringListOfInteger = new TypeToken<ConcurrentHashMap<String, List<Integer>>>() {}.getType();
-        writeJson(postsNetworkPath, SocialNetworkManager.postsNetwork, mapStringListOfInteger);
+        writeJsonMap(postsNetworkPath, SocialNetworkManager.postsNetwork, mapStringListOfInteger);
 
         String tagsNetworkPath = tags_networkDirPath.concat("tagsNetwork.json");
-        writeJson(tagsNetworkPath, SocialNetworkManager.tagsNetwork, mapStringListOfString);
+        writeJsonMap(tagsNetworkPath, SocialNetworkManager.tagsNetwork, mapStringListOfString);
+
+        String removedIDsPath = removed_IDsPath.concat("removedIDs.json");
+        Type queueOfInteger = new TypeToken<ConcurrentLinkedQueue<Integer>>() {}.getType();
+        writeJsonQueue(removedIDsPath, SocialNetworkManager.removedIDs, queueOfInteger);
 
     }
 
-    private <K, V> void writeJson(String filepath, Map<K, V> map, Type mapType) {
+    private <K, V> void writeJsonMap(String filepath, Map<K, V> map, Type mapType) {
 
         try ( Writer writer = new FileWriter(filepath, StandardCharsets.UTF_8) ) {
             JsonWriter jsonWriter = new JsonWriter(writer);
             jsonWriter.setIndent("\n");
             gson.toJson(map, mapType, jsonWriter);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private <T> void writeJsonQueue(String filepath, Queue<T> list, Type queueType) {
+
+        try ( Writer writer = new FileWriter(filepath, StandardCharsets.UTF_8) ) {
+            JsonWriter jsonWriter = new JsonWriter(writer);
+            jsonWriter.setIndent("\n");
+            gson.toJson(list, queueType, jsonWriter);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

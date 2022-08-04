@@ -39,7 +39,8 @@ public class ServerMain {
                                             configurationParser.getUsersNetworkDirPath(),
                                             configurationParser.getPostsDirPath(),
                                             configurationParser.getPostsNetworkDirPath(),
-                                            configurationParser.getTagsNetworkDirPath() };
+                                            configurationParser.getTagsNetworkDirPath(),
+                                            configurationParser.getRemovedIDsDirPath() };
 
         StateLoader stateLoader = new StateLoader(statePaths);
         stateLoader.loadState();
