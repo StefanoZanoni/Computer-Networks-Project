@@ -28,9 +28,9 @@ public final class User {
 
     @Override
     public String toString() {
-        return  "user: " + this.getUsername() + "\n" +
-                "tags: " + this.getTags() + "\n" +
-                "wallet: " + this.getWallet();
+        return  "< user: " + this.getUsername() + "\n" +
+                "< tags: " + this.getTags() + "\n" +
+                "< wallet: " + this.getWallet();
     }
 
 }

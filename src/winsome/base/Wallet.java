@@ -42,8 +42,8 @@ public final class Wallet {
     public void setRewardsBTC(float rewardsBTC) { rewards = rewardsBTC; }
     @Override
     public String toString() {
-        return "rewards: " + this.getRewards() + "\n" +
-               "transactions: " + this.getTransactions();
+        return "< rewards: " + this.getRewards() + "\n" +
+               "< transactions: " + this.getTransactions();
     }
 
 }

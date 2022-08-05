@@ -7,12 +7,20 @@ public enum NetError {
 
     NONE(0) {
         @Override
-        public void showError() { System.out.println("< Operation completed successfully"); }
+        public void showError() {
+            System.out.println("< Operation completed successfully");
+            System.out.print("> ");
+        }
     },
     USERNAMEALREADYEXISTS(1) {
         @Override
         public void showError() {
             System.err.println("< Error: the inserted username is already present");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -20,6 +28,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: the password is empty");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -27,6 +40,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: wrong password");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -34,6 +52,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: You have already rated this post");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -41,6 +64,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: You cannot rate, comment or rewin a post of a user you not follow");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -48,6 +76,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: You cannot rate your own post");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -55,6 +88,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: You are not the owner of this post");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -62,6 +100,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: inserted username does not exist");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -69,6 +112,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: user already logged in");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -76,6 +124,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: user not yet logged in");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -83,6 +136,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: post does not exist");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -90,6 +148,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: post already voted");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -97,6 +160,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: the vote is invalid");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -104,6 +172,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: you don't follow this user");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     },
@@ -111,6 +184,11 @@ public enum NetError {
         @Override
         public void showError() {
             System.err.println("< Error: you cannot follow yourself");
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             System.out.print("> ");
         }
     }

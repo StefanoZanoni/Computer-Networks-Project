@@ -86,10 +86,10 @@ public final class Post {
     }
 
     public String toString() {
-        return  "Title: " + this.getTitle() + "\n"
-                + "Content: " + this.getContent() + "\n"
-                + "Votes: " + this.getUpvotes().size() + " positive" + ", " +  this.getDownvotes().size() + " negative\n"
-                + "Comments: " + comments;
+        return  "< Title: " + this.getTitle() + "\n"
+                + "< Content: " + this.getContent() + "\n"
+                + "< Votes: " + this.getUpvotes().size() + " positive" + ", " +  this.getDownvotes().size() + " negative\n"
+                + "< Comments: " + comments;
     }
 
     /**

@@ -42,7 +42,8 @@ public class MulticastManager implements Runnable {
 
             try {
                 multicastSocket.receive(datagramPacket);
-                System.out.println("Wallet updated");
+                System.out.println("< Wallet updated");
+                System.out.print("> ");
             }
             // in case of closing
             catch (SocketException ignored) {}

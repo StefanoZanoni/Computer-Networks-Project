@@ -39,18 +39,33 @@ public class ClientMain {
 
         do {
 
-            if (!error)
+            if (!error) {
                 System.out.print("> ");
+                System.out.flush();
+            }
 
+            // sleep is necessary to synchronize System.err and System.out buffer
             try {
                 commandParser.parse();
             } catch (IllegalArgumentException e) {
                 System.err.println(e.getMessage());
+                error = true;
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                System.out.print("> ");
                 continue;
             } catch (UnknownCommandException e) {
                 System.err.println("< This is not a valid command");
-                System.out.print("> ");
                 error = true;
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                System.out.print("> ");
                 continue;
             }
 
@@ -72,6 +87,7 @@ public class ClientMain {
                 shutdownHook.setMulticastManagerThread(multicastManagerThread);
                 multicastManagerThread.start();
                 System.out.println("< Operation completed successfully");
+                error = false;
 
                 ClientRMIManger rmiManger = new ClientRMIManger(arguments.get(0));
                 shutdownHook.setRMIManager(rmiManger);

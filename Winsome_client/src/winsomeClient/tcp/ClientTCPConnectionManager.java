@@ -265,8 +265,8 @@ public class ClientTCPConnectionManager {
 
         }
         else if (bufferCapacity == 0) {
-            System.out.println("< No users match the request");
-            ClientMain.error = true;
+            System.out.println("< No user matches the request");
+            ClientMain.error = false;
         }
         else {
 
@@ -321,8 +321,8 @@ public class ClientTCPConnectionManager {
 
         }
         else if (bufferCapacity == 0) {
-            System.out.println("< No posts have been published yet");
-            ClientMain.error = true;
+            System.out.println("< No post has been published yet");
+            ClientMain.error = false;
         }
         else {
 
