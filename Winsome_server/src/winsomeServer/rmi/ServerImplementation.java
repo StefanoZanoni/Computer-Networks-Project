@@ -9,8 +9,8 @@ import java.util.*;
 
 public class ServerImplementation extends RemoteObject implements ServerInterface {
 
-    private List<ClientNotificationInterface> clients;
-    private Map<String, ClientNotificationInterface> map;
+    private final List<ClientNotificationInterface> clients;
+    private final Map<String, ClientNotificationInterface> map;
 
     public ServerImplementation() throws RemoteException {
 
@@ -41,11 +41,12 @@ public class ServerImplementation extends RemoteObject implements ServerInterfac
     public void doCallback(String clientUsername, String user, boolean flag) {
 
         ClientNotificationInterface client = map.get(clientUsername);
-        try {
-            client.notify(user, flag);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        if (client != null)
+            try {
+                client.notify(user, flag);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
 
     }
 

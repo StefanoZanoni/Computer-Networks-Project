@@ -49,7 +49,7 @@ public class SocialNetworkManager {
     public static void addUser(SocketChannel client, String username, char[] password, List<String> tags)
             throws UsernameAlreadyExistsException {
 
-        if ( users.containsKey(username) )
+        if (users.containsKey(username))
             throw new UsernameAlreadyExistsException();
 
         User user = new User(username, password, tags);
@@ -76,7 +76,7 @@ public class SocialNetworkManager {
             throw new UserAlreadyLoggedInException();
         if (!users.containsKey(username))
             throw new UserDoesNotExistException();
-        if ( !Arrays.equals(users.get(username).getPassword(), password) )
+        if (!Arrays.equals(users.get(username).getPassword(), password))
             throw new WrongPasswordException();
         Arrays.fill(password, (char) 0);
 
@@ -158,10 +158,10 @@ public class SocialNetworkManager {
             throw new UserDoesNotExistException();
 
         List<String> followed = usersNetwork.get(user);
-        if (!followed.contains(username))
+        if (!followed.contains(username)) {
             followed.add(username);
-
-        rmiManager.update(username, user, true);
+            rmiManager.update(username, user, true);
+        }
 
     }
 

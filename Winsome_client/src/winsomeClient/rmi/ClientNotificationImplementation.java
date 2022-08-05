@@ -14,11 +14,13 @@ public class ClientNotificationImplementation extends RemoteObject implements Cl
     public void notify(String username, boolean flag) throws RemoteException {
 
         if (flag) {
-            System.out.println(username + " has started following you");
+            System.out.println("< " + username + " has started following you");
+            System.out.print("> ");
             ClientMain.followers.add(username);
         }
         else {
-            System.out.println(username + " has stopped following you");
+            System.out.println("< " + username + " has stopped following you");
+            System.out.print("> ");
             ClientMain.followers.remove(username);
         }
 
