@@ -39,33 +39,21 @@ public class ClientMain {
 
         do {
 
-            if (!error) {
+            if (!error)
                 System.out.print("> ");
-                System.out.flush();
-            }
 
             // sleep is necessary to synchronize System.err and System.out buffer
             try {
                 commandParser.parse();
             } catch (IllegalArgumentException e) {
-                System.err.println(e.getMessage());
-                error = true;
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
+                System.out.println(e.getMessage());
                 System.out.print("> ");
+                error = true;
                 continue;
             } catch (UnknownCommandException e) {
-                System.err.println("< This is not a valid command");
-                error = true;
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
+                System.out.println("< This is not a valid command");
                 System.out.print("> ");
+                error = true;
                 continue;
             }
 

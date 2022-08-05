@@ -3,13 +3,12 @@ package winsomeServer.network;
 import winsome.base.Post;
 import winsomeServer.ServerMain;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-public class RewardsCalculator extends TimerTask implements Closeable {
+public class RewardsCalculator extends TimerTask implements AutoCloseable {
 
     private boolean closed = false;
     /*
@@ -114,8 +113,11 @@ public class RewardsCalculator extends TimerTask implements Closeable {
     @Override
     public void close() throws IOException {
 
-        multicastSocket.leaveGroup(group, networkInterface);
-        multicastSocket.close();
+        if (!isClosed()) {
+            multicastSocket.leaveGroup(group, networkInterface);
+            multicastSocket.close();
+        }
+
         closed = true;
 
     }
