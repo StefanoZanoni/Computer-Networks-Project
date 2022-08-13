@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -23,25 +24,18 @@ import java.util.regex.Pattern;
 
 public class ClientTCPConnectionManager {
     SocketChannel socketChannel;
+    private boolean closed;
 
-    public ClientTCPConnectionManager() {
+    public ClientTCPConnectionManager() throws IOException {
 
-        try {
-            socketChannel = SocketChannel.open();
-        } catch (IOException e) {
-            e.printStackTrace(System.err);
-            throw new RuntimeException("the client was unable to open the socket");
-        }
+        closed = false;
+        socketChannel = SocketChannel.open();
 
     }
 
-    public void establishConnection(InetAddress host, int port) {
+    public void establishConnection(InetAddress host, int port) throws IOException {
 
-        try {
-            socketChannel.connect(new InetSocketAddress(host, port));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        socketChannel.connect(new InetSocketAddress(host, port));
 
     }
 
@@ -114,7 +108,7 @@ public class ClientTCPConnectionManager {
                         receive();
                     }
 
-                    default -> throw new UnknownCommandException(command + "is not a valid command");
+                    default -> throw new UnknownCommandException("< " + command + "is not a valid command");
 
                 }
 
@@ -122,10 +116,14 @@ public class ClientTCPConnectionManager {
 
         }
 
-        CommandSelector commandSelector = new CommandSelector();
-        try {
-            commandSelector.select(command, arguments);
-        } catch (UnknownCommandException ignored) {}
+        if (isNotClosed()) {
+
+            CommandSelector commandSelector = new CommandSelector();
+            try {
+                commandSelector.select(command, arguments);
+            } catch (UnknownCommandException ignored) {}
+
+        }
 
     }
 
@@ -142,26 +140,38 @@ public class ClientTCPConnectionManager {
             T argument = iterator.next();
             request = request.concat(argument.toString());
         }
-        int bufferCapacity = request.getBytes(StandardCharsets.UTF_8).length;
+        byte[] requestBytes = request.getBytes(StandardCharsets.UTF_8);
+        int bufferCapacity = requestBytes.length;
 
         ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
         buffer.putInt(bufferCapacity);
-        try {
-            buffer.flip();
-            socketChannel.write(buffer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        if (isNotClosed())
+            try {
+                buffer.flip();
+                socketChannel.write(buffer);
+            }
+            catch (ClosedChannelException ignored) { return; }
+            catch (IOException e) {
+                System.err.println("it was impossible to send the request");
+                e.printStackTrace(System.err);
+                return;
+            }
+        else
+            return;
 
         buffer = ByteBuffer.allocate(bufferCapacity);
-        buffer.put( request.getBytes(StandardCharsets.UTF_8) );
+        buffer.put(requestBytes);
 
-        try {
-            buffer.flip();
-            socketChannel.write(buffer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        if (isNotClosed())
+            try {
+                buffer.flip();
+                socketChannel.write(buffer);
+            }
+            catch (ClosedChannelException ignored) {}
+            catch (IOException e) {
+                System.err.println("it was impossible to send the request");
+                e.printStackTrace(System.err);
+            }
 
     }
 
@@ -169,23 +179,40 @@ public class ClientTCPConnectionManager {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-        try {
-            socketChannel.read(buffer);
-            buffer.flip();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        if (isNotClosed()) {
+            try {
+                socketChannel.read(buffer);
+                buffer.flip();
+            }
+            catch (ClosedChannelException ignored) { return; }
+            catch (IOException e) {
+                System.err.println("an error occurred while receiving the response");
+                e.printStackTrace(System.err);
+                return;
+            }
+            bufferCapacity = buffer.getInt();
         }
-        bufferCapacity = buffer.getInt();
+        else
+            return;
 
         if (bufferCapacity == Integer.BYTES) {
 
-            try {
-                buffer.clear();
-                socketChannel.read(buffer);
-                buffer.flip();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            if (isNotClosed())
+                try {
+                    buffer.clear();
+                    socketChannel.read(buffer);
+                    buffer.flip();
+                }
+                catch (ClosedChannelException ignored) { return; }
+                catch (IOException e) {
+                    System.err.println("an error occurred while receiving the response");
+                    e.printStackTrace(System.err);
+                    return;
+                }
+            else
+                return;
+
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
             ClientMain.correctIdentification = false;
@@ -195,12 +222,21 @@ public class ClientTCPConnectionManager {
         else {
 
             buffer = ByteBuffer.allocate(bufferCapacity);
-            try {
-                socketChannel.read(buffer);
-                buffer.flip();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
+            if(isNotClosed())
+                try {
+                    socketChannel.read(buffer);
+                    buffer.flip();
+                }
+                catch (ClosedChannelException ignored) { return; }
+                catch (IOException e) {
+                    System.err.println("an error occurred while receiving the response");
+                    e.printStackTrace(System.err);
+                    return;
+                }
+            else
+                return;
+
             String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
             String[] references = outcome.split("\\|");
             Gson gson = new Gson();
@@ -220,12 +256,21 @@ public class ClientTCPConnectionManager {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-        try {
-            socketChannel.read(buffer);
-            buffer.flip();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        if (isNotClosed())
+            try {
+                socketChannel.read(buffer);
+                buffer.flip();
+            }
+            catch (ClosedChannelException ignored) { return; }
+            catch (IOException e) {
+                System.err.println("an error occurred while receiving the response");
+                e.printStackTrace(System.err);
+                return;
+            }
+        else
+            return;
+
         int outcome = buffer.getInt();
         if (outcome >= 1000) {
             System.out.println("< Post created successfully: ID " + outcome);
@@ -243,22 +288,39 @@ public class ClientTCPConnectionManager {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-        try {
-            socketChannel.read(buffer);
-            buffer.flip();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        if (isNotClosed())
+            try {
+                socketChannel.read(buffer);
+                buffer.flip();
+            }
+            catch (ClosedChannelException ignored) { return; }
+            catch (IOException e) {
+                System.err.println("an error occurred while receiving the response");
+                e.printStackTrace(System.err);
+                return;
+            }
+        else
+            return;
+
         bufferCapacity = buffer.getInt();
         if (bufferCapacity == Integer.BYTES) {
 
-            try {
-                buffer.clear();
-                socketChannel.read(buffer);
-                buffer.flip();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            if (isNotClosed())
+                try {
+                    buffer.clear();
+                    socketChannel.read(buffer);
+                    buffer.flip();
+                }
+                catch (ClosedChannelException ignored) { return; }
+                catch (IOException e) {
+                    System.err.println("an error occurred while receiving the response");
+                    e.printStackTrace(System.err);
+                    return;
+                }
+            else
+                return;
+
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
             ClientMain.error = true;
@@ -271,12 +333,21 @@ public class ClientTCPConnectionManager {
         else {
 
             buffer = ByteBuffer.allocate(bufferCapacity);
-            try {
-                socketChannel.read(buffer);
-                buffer.flip();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
+            if (isNotClosed())
+                try {
+                    socketChannel.read(buffer);
+                    buffer.flip();
+                }
+                catch (ClosedChannelException ignored) { return; }
+                catch (IOException e) {
+                    System.err.println("an error occurred while receiving the response");
+                    e.printStackTrace(System.err);
+                    return;
+                }
+            else
+                return;
+
             String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
             String[] data = outcome.split("\\|");
             Gson gson = new Gson();
@@ -299,22 +370,39 @@ public class ClientTCPConnectionManager {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-        try {
-            socketChannel.read(buffer);
-            buffer.flip();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        if (isNotClosed())
+            try {
+                socketChannel.read(buffer);
+                buffer.flip();
+            }
+            catch (ClosedChannelException ignored) { return; }
+            catch (IOException e) {
+                System.err.println("an error occurred while receiving the response");
+                e.printStackTrace(System.err);
+                return;
+            }
+        else
+            return;
+
         bufferCapacity = buffer.getInt();
         if (bufferCapacity == Integer.BYTES) {
 
-            try {
-                buffer.clear();
-                socketChannel.read(buffer);
-                buffer.flip();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            if (isNotClosed())
+                try {
+                    buffer.clear();
+                    socketChannel.read(buffer);
+                    buffer.flip();
+                }
+                catch (ClosedChannelException ignored) { return; }
+                catch (IOException e) {
+                    System.err.println("an error occurred while receiving the response");
+                    e.printStackTrace(System.err);
+                    return;
+                }
+            else
+                return;
+
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
             ClientMain.error = true;
@@ -327,12 +415,20 @@ public class ClientTCPConnectionManager {
         else {
 
             buffer = ByteBuffer.allocate(bufferCapacity);
-            try {
-                socketChannel.read(buffer);
-                buffer.flip();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            if (isNotClosed())
+                try {
+                    socketChannel.read(buffer);
+                    buffer.flip();
+                }
+                catch (ClosedChannelException ignored) { return; }
+                catch (IOException e) {
+                    System.err.println("an error occurred while receiving the response");
+                    e.printStackTrace(System.err);
+                    return;
+                }
+            else
+                return;
+
             String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
             String[] data = outcome.split("\\|");
 
@@ -354,22 +450,39 @@ public class ClientTCPConnectionManager {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-        try {
-            socketChannel.read(buffer);
-            buffer.flip();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        if (isNotClosed())
+            try {
+                socketChannel.read(buffer);
+                buffer.flip();
+            }
+            catch (ClosedChannelException ignored) { return; }
+            catch (IOException e) {
+                System.err.println("an error occurred while receiving the response");
+                e.printStackTrace(System.err);
+                return;
+            }
+        else
+            return;
+
         bufferCapacity = buffer.getInt();
         if (bufferCapacity == Integer.BYTES) {
 
-            try {
-                buffer.clear();
-                socketChannel.read(buffer);
-                buffer.flip();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            if (isNotClosed())
+                try {
+                    buffer.clear();
+                    socketChannel.read(buffer);
+                    buffer.flip();
+                }
+                catch (ClosedChannelException ignored) { return; }
+                catch (IOException e) {
+                    System.err.println("an error occurred while receiving the response");
+                    e.printStackTrace(System.err);
+                    return;
+                }
+            else
+                return;
+
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
             ClientMain.error = true;
@@ -378,12 +491,21 @@ public class ClientTCPConnectionManager {
         else {
 
             buffer = ByteBuffer.allocate(bufferCapacity);
-            try {
-                socketChannel.read(buffer);
-                buffer.flip();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
+            if (isNotClosed())
+                try {
+                    socketChannel.read(buffer);
+                    buffer.flip();
+                }
+                catch (ClosedChannelException ignored) { return; }
+                catch (IOException e) {
+                    System.err.println("an error occurred while receiving the response");
+                    e.printStackTrace(System.err);
+                    return;
+                }
+            else
+                return;
+
             String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
             Gson gson = new Gson();
             Post post = gson.fromJson(outcome, Post.class);
@@ -398,22 +520,39 @@ public class ClientTCPConnectionManager {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-        try {
-            socketChannel.read(buffer);
-            buffer.flip();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        if (isNotClosed())
+            try {
+                socketChannel.read(buffer);
+                buffer.flip();
+            }
+            catch (ClosedChannelException ignored) { return; }
+            catch (IOException e) {
+                System.err.println("an error occurred while receiving the response");
+                e.printStackTrace(System.err);
+                return;
+            }
+        else
+            return;
+
         bufferCapacity = buffer.getInt();
         if (bufferCapacity == Integer.BYTES) {
 
-            try {
-                buffer.clear();
-                socketChannel.read(buffer);
-                buffer.flip();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            if (isNotClosed())
+                try {
+                    buffer.clear();
+                    socketChannel.read(buffer);
+                    buffer.flip();
+                }
+                catch (ClosedChannelException ignored) { return; }
+                catch (IOException e) {
+                    System.err.println("an error occurred while receiving the response");
+                    e.printStackTrace(System.err);
+                    return;
+                }
+            else
+                return;
+
             NetError error = NetError.valueOf(buffer.getInt());
             error.showError();
             ClientMain.error = true;
@@ -422,12 +561,21 @@ public class ClientTCPConnectionManager {
         else {
 
             buffer = ByteBuffer.allocate(bufferCapacity);
-            try {
-                socketChannel.read(buffer);
-                buffer.flip();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
+            if (isNotClosed())
+                try {
+                    socketChannel.read(buffer);
+                    buffer.flip();
+                }
+                catch (ClosedChannelException ignored) { return; }
+                catch (IOException e) {
+                    System.err.println("an error occurred while receiving the response");
+                    e.printStackTrace(System.err);
+                    return;
+                }
+            else
+                return;
+
             String outcome = StandardCharsets.UTF_8.decode(buffer).toString();
             Gson gson = new Gson();
             Wallet wallet = gson.fromJson(outcome, Wallet.class);
@@ -505,13 +653,19 @@ public class ClientTCPConnectionManager {
 
     }
 
+    public boolean isNotClosed() { return !closed; }
+
     public void close() {
 
-        try {
-            socketChannel.close();
-        } catch (IOException e) {
-            throw new RuntimeException("error while closing the socket");
-        }
+        if (isNotClosed())
+            try {
+                socketChannel.close();
+            } catch (IOException e) {
+                e.printStackTrace(System.err);
+            }
+
+        closed = true;
 
     }
+
 }

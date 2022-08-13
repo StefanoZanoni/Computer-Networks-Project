@@ -13,25 +13,17 @@ public class MulticastManager implements Runnable {
     private final InetSocketAddress group;
     private final NetworkInterface networkInterface;
 
-    public MulticastManager() {
+    public MulticastManager() throws IOException {
 
         byte[] buffer = new byte[Integer.BYTES];
         datagramPacket = new DatagramPacket(buffer, buffer.length);
 
         group = new InetSocketAddress(ClientMain.multicastIP, ClientMain.multicastPort);
-        try {
-            networkInterface = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-        } catch (SocketException | UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
+        networkInterface = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
 
-        try {
-            multicastSocket = new MulticastSocket(ClientMain.multicastPort);
-            multicastSocket.setReuseAddress(true);
-            multicastSocket.joinGroup(group, networkInterface);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        multicastSocket = new MulticastSocket(ClientMain.multicastPort);
+        multicastSocket.setReuseAddress(true);
+        multicastSocket.joinGroup(group, networkInterface);
 
     }
 
@@ -46,9 +38,10 @@ public class MulticastManager implements Runnable {
                 System.out.print("> ");
             }
             // in case of closing
-            catch (SocketException ignored) {}
+            catch (SocketException ignored) { return; }
             catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
+                System.err.print("An error occurred while receiving datagram packet");
             }
 
         }
@@ -58,10 +51,11 @@ public class MulticastManager implements Runnable {
     public void shutdown() {
 
         shutdown = true;
+
         try {
             multicastSocket.leaveGroup(group, networkInterface);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace(System.err);
         }
         multicastSocket.close();
 

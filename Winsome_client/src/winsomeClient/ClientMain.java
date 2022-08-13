@@ -8,7 +8,10 @@ import winsomeClient.rmi.ClientRMIManger;
 import winsomeClient.shutdown.ClientShutdownHook;
 import winsomeClient.tcp.ClientTCPConnectionManager;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +32,19 @@ public class ClientMain {
 
         CommandParser commandParser = new CommandParser();
 
-        ClientTCPConnectionManager tcpConnectionManager = new ClientTCPConnectionManager();
-        tcpConnectionManager.establishConnection(configurationParser.getHost(), configurationParser.getTcpPort());
+        ClientTCPConnectionManager tcpConnectionManager = null;
+        try {
+            tcpConnectionManager = new ClientTCPConnectionManager();
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+            System.exit(-1);
+        }
+        try {
+            tcpConnectionManager.establishConnection(configurationParser.getHost(), configurationParser.getTcpPort());
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+            System.exit(-1);
+        }
 
         ClientShutdownHook shutdownHook = new ClientShutdownHook(tcpConnectionManager, commandParser);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
@@ -42,7 +56,6 @@ public class ClientMain {
             if (!error)
                 System.out.print("> ");
 
-            // sleep is necessary to synchronize System.err and System.out buffer
             try {
                 commandParser.parse();
             } catch (IllegalArgumentException e) {
@@ -58,36 +71,63 @@ public class ClientMain {
             }
 
             command = commandParser.getCommand();
-            if (command.compareTo("list followers") == 0) {
-                System.out.println(followers);
-                continue;
+
+            if (command != null) {
+
+                if (command.compareTo("list followers") == 0) {
+                    System.out.println("< " + followers);
+                    continue;
+                }
+
+                List<String> arguments = commandParser.getArguments();
+
+                tcpConnectionManager.interact(command, arguments);
+
+                if ((command.compareTo("register") == 0 || command.compareTo("login") == 0)
+                        && correctIdentification) {
+
+                    MulticastManager multicastManager = null;
+                    try {
+                        multicastManager = new MulticastManager();
+                    } catch (IOException e) {
+                        e.printStackTrace(System.err);
+                        System.exit(-1);
+                    }
+
+                    shutdownHook.setMulticastManager(multicastManager);
+                    Thread multicastManagerThread = new Thread(multicastManager);
+                    shutdownHook.setMulticastManagerThread(multicastManagerThread);
+                    multicastManagerThread.start();
+                    System.out.println("< Operation completed successfully");
+                    error = false;
+
+                    ClientRMIManger rmiManger = null;
+                    try {
+                        rmiManger = new ClientRMIManger(arguments.get(0));
+                    } catch (RemoteException | NotBoundException e) {
+                        e.printStackTrace(System.err);
+                        System.exit(-1);
+                    }
+                    shutdownHook.setRMIManager(rmiManger);
+                    try {
+                        rmiManger.register();
+                    } catch (RemoteException e) {
+                        e.printStackTrace(System.err);
+                        System.exit(-1);
+                    }
+
+                }
+
             }
-            List<String> arguments = commandParser.getArguments();
 
-            tcpConnectionManager.interact(command, arguments);
+        } while( (command != null ? command.compareTo("logout") : 0) != 0 );
 
-            if ( (command.compareTo("register") == 0 || command.compareTo("login") == 0)
-                    && correctIdentification) {
-
-                MulticastManager multicastManager = new MulticastManager();
-                shutdownHook.setMulticastManager(multicastManager);
-                Thread multicastManagerThread = new Thread(multicastManager);
-                shutdownHook.setMulticastManagerThread(multicastManagerThread);
-                multicastManagerThread.start();
-                System.out.println("< Operation completed successfully");
-                error = false;
-
-                ClientRMIManger rmiManger = new ClientRMIManger(arguments.get(0));
-                shutdownHook.setRMIManager(rmiManger);
-                rmiManger.register();
-
-            }
-
-        } while(command.compareTo("logout") != 0);
-
-        shutdownHook.setCorrectTermination(true);
-
-        System.exit(0);
+        // correct termination has already been set to true or
+        // false (in case of error) in which case I can't set it newly to true;
+        if (command != null) {
+            shutdownHook.setCorrectTermination(true);
+            System.exit(0);
+        }
 
     }
 

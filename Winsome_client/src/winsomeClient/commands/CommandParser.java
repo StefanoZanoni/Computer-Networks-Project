@@ -15,7 +15,14 @@ public class CommandParser implements AutoCloseable {
 
         List<String> words = new ArrayList<>();
         Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
-        Matcher regexMatcher = regex.matcher(scanner.nextLine());
+        Matcher regexMatcher;
+        try {
+            regexMatcher = regex.matcher(scanner.nextLine());
+        } catch (IllegalStateException ignored) {
+            command = null;
+            return;
+        }
+
         while (regexMatcher.find()) {
             if (regexMatcher.group(1) != null) {
                 // add double-quoted string without the quotes
@@ -29,63 +36,70 @@ public class CommandParser implements AutoCloseable {
             }
         }
 
-        command = words.get(0);
-        if ( command.compareTo("list") == 0 || command.compareTo("show") == 0 ||
-                (command.compareTo("wallet") == 0 && !words.subList(1, words.size()).isEmpty()) )
-            command = command.concat(" " + words.remove(1));
+        // words.size == 0 if regexMatcher is null
+        if (words.size() != 0) {
 
-        switch (command) {
+            command = words.get(0);
+            if (command.compareTo("list") == 0 || command.compareTo("show") == 0 ||
+                    (command.compareTo("wallet") == 0 && !words.subList(1, words.size()).isEmpty()))
+                command = command.concat(" " + words.remove(1));
 
-            case "register" -> {
-                if (words.size() < 3 || words.size() > 8)
-                    throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+            switch (command) {
+
+                case "register" -> {
+                    if (words.size() < 3 || words.size() > 8)
+                        throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+                }
+
+                case "post" -> {
+                    if (words.size() != 3)
+                        throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+                    if (words.get(1).length() > 20)
+                        throw new IllegalArgumentException("< Title length is greater than 20 characters");
+                    if (words.get(2).length() > 500)
+                        throw new IllegalArgumentException("< Content length is greater than 500 characters");
+                }
+
+                case "login", "comment", "rate" -> {
+                    if (words.size() != 3)
+                        throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+                }
+
+                case "logout", "blog", "wallet", "list users", "list following",
+                        "list followers", "show feed", "wallet btc" -> {
+                    if (words.size() > 1)
+                        throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+                }
+
+                case "follow", "rewin", "delete", "unfollow", "show post" -> {
+                    if (words.size() != 2)
+                        throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+                }
+
+                default -> throw new UnknownCommandException();
+
             }
 
-            case "post" -> {
-                if (words.size() != 3)
-                    throw new IllegalArgumentException("< The number of inserted arguments is not valid");
-                if (words.get(1).length() > 20)
-                    throw new IllegalArgumentException("< Title length is greater than 20 characters");
-                if (words.get(2).length() > 500)
-                    throw new IllegalArgumentException("< Content length is greater than 500 characters");
-            }
-
-            case "login", "comment", "rate" -> {
-                if (words.size() != 3)
-                    throw new IllegalArgumentException("< The number of inserted arguments is not valid");
-            }
-
-            case "logout", "blog", "wallet", "list users", "list following",
-                                "list followers", "show feed", "wallet btc" -> {
-                if (words.size() > 1)
-                    throw new IllegalArgumentException("< The number of inserted arguments is not valid");
-            }
-
-            case "follow", "rewin", "delete", "unfollow", "show post" -> {
-                if (words.size() != 2)
-                    throw new IllegalArgumentException("< The number of inserted arguments is not valid");
-            }
-
-            default -> throw new UnknownCommandException();
+            arguments.addAll(words.subList(1, words.size()));
 
         }
-
-        arguments.addAll(words.subList(1, words.size()));
 
     }
 
     public String getCommand() { return command; }
     public List<String> getArguments() {
+
         List<String> temp = new LinkedList<>(arguments);
         arguments.clear();
         return temp;
+
     }
 
-    public boolean isClosed() { return closed; }
+    public boolean isNotClosed() { return !closed; }
     @Override
     public void close() {
 
-        if (!isClosed())
+        if (isNotClosed())
             scanner.close();
 
         closed = true;

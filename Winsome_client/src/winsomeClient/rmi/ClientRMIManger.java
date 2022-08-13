@@ -17,51 +17,24 @@ public class ClientRMIManger {
     ServerInterface server;
     ClientNotificationInterface stub;
 
-    public ClientRMIManger(String username) {
+    public ClientRMIManger(String username) throws RemoteException, NotBoundException {
 
         this.username = username;
-
-        try {
-            registry = LocateRegistry.getRegistry(ClientMain.rmiCallbackPort);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            server = (ServerInterface) registry.lookup(ClientMain.rmiCallbackName);
-        } catch (RemoteException | NotBoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        ClientNotificationInterface callbackObject;
-        try {
-            callbackObject = new ClientNotificationImplementation();
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            stub = (ClientNotificationInterface) UnicastRemoteObject.exportObject(callbackObject, 0);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        registry = LocateRegistry.getRegistry(ClientMain.rmiCallbackPort);
+        server = (ServerInterface) registry.lookup(ClientMain.rmiCallbackName);
+        ClientNotificationInterface callbackObject = new ClientNotificationImplementation();
+        stub = (ClientNotificationInterface) UnicastRemoteObject.exportObject(callbackObject, 0);
 
     }
 
-    public void register() {
+    public void register() throws RemoteException { server.registerForCallback(stub, username); }
 
-        try {
-            server.registerForCallback(stub, username);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
     public void unregister() {
 
         try {
             server.unregisterForCallback(stub, username);
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace(System.err);
         }
 
     }
