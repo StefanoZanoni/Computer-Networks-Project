@@ -38,10 +38,11 @@ public class ClientShutdownHook extends Thread {
             clientTCPConnectionManager.close();
         if (multicastManager != null)
             multicastManager.shutdown();
-        try {
-            multicastManagerThread.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        if (multicastManagerThread != null)
+            try {
+                multicastManagerThread.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
         }
         if (rmiManger != null)
             rmiManger.unregister();
