@@ -68,17 +68,25 @@ public class ServerTCPConnectionsManager implements AutoCloseable {
                         int readBytes = 0;
                         do {
                             readBytes += client.read(clientData);
+                            if (readBytes <= -1)
+                                break;
                         } while (readBytes < Integer.BYTES);
                         clientData.flip();
-                        int requestDim = clientData.getInt();
-                        clientData = ByteBuffer.allocate(requestDim);
-                        readBytes = 0;
-                        do {
-                            readBytes += client.read(clientData);
-                        } while (readBytes < requestDim);
-                        clientData.flip();
-                        Task task = createTask(clientData, client);
-                        threadPool.submit(task);
+                        if (clientData.hasRemaining()) {
+                            int requestDim = clientData.getInt();
+                            clientData = ByteBuffer.allocate(requestDim);
+                            readBytes = 0;
+                            do {
+                                readBytes += client.read(clientData);
+                                if (readBytes <= -1)
+                                    break;
+                            } while (readBytes < requestDim);
+                            clientData.flip();
+                            if (clientData.hasRemaining()) {
+                                Task task = createTask(clientData, client);
+                                threadPool.submit(task);
+                            }
+                        }
                     }
 
                 } catch (IOException e) {

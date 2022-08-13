@@ -36,7 +36,7 @@ public class CommandParser implements AutoCloseable {
             }
         }
 
-        // words.size == 0 if regexMatcher is null
+        // words.size == 0 if regexMatcher is null or nextLine is an empty line
         if (words.size() != 0) {
 
             command = words.get(0);
@@ -83,6 +83,8 @@ public class CommandParser implements AutoCloseable {
             arguments.addAll(words.subList(1, words.size()));
 
         }
+        else
+            throw new UnknownCommandException();
 
     }
 
