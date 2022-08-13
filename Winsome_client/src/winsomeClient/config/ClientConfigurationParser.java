@@ -11,20 +11,15 @@ import java.nio.file.Paths;
 
 public class ClientConfigurationParser extends ConfigurationParser {
 
-    protected void setDefault() {
+    protected void setDefault() throws UnknownHostException {
 
-        try {
-            host = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            throw new RuntimeException("default tcp host not found");
-        }
+        host = InetAddress.getLocalHost();
         tcpPort = 7000;
 
     }
 
     @Override
-    public void parseConfiguration() {
+    public void parseConfiguration() throws UnknownHostException {
 
         Path filepath = Paths.get("Winsome_client/client.cfg").toAbsolutePath();
 

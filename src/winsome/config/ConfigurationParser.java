@@ -2,6 +2,7 @@ package winsome.config;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +19,6 @@ public abstract class ConfigurationParser {
     protected Map<String, String> map = new HashMap<>();
 
     public abstract void parseConfiguration() throws IOException;
-    protected abstract void setDefault();
+    protected abstract void setDefault() throws UnknownHostException;
 
 }

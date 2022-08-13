@@ -10,6 +10,7 @@ import winsomeClient.tcp.ClientTCPConnectionManager;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -28,7 +29,12 @@ public class ClientMain {
     public static void main(String[] args) {
 
         ClientConfigurationParser configurationParser = new ClientConfigurationParser();
-        configurationParser.parseConfiguration();
+        try {
+            configurationParser.parseConfiguration();
+        } catch (UnknownHostException e) {
+            e.printStackTrace(System.err);
+            System.exit(-1);
+        }
 
         CommandParser commandParser = new CommandParser();
 
