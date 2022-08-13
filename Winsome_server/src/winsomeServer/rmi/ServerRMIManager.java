@@ -15,39 +15,15 @@ public class ServerRMIManager {
     ServerImplementation server;
     Registry registry;
 
-    public ServerRMIManager() {
+    public ServerRMIManager() throws RemoteException { server = new ServerImplementation(); }
 
-        try {
-            server = new ServerImplementation();
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public void createRegistry() {
+    public void createRegistry() throws RemoteException, AlreadyBoundException {
 
         ServerInterface stub;
-        try {
-            stub = (ServerInterface) UnicastRemoteObject.exportObject(server, 0);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            LocateRegistry.createRegistry(ServerMain.rmiCallbackPort);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            registry = LocateRegistry.getRegistry(ServerMain.rmiCallbackPort);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            registry.bind(ServerMain.rmiCallbackName, stub);
-        } catch (RemoteException | AlreadyBoundException e) {
-            throw new RuntimeException(e);
-        }
+        stub = (ServerInterface) UnicastRemoteObject.exportObject(server, 0);
+        LocateRegistry.createRegistry(ServerMain.rmiCallbackPort);
+        registry = LocateRegistry.getRegistry(ServerMain.rmiCallbackPort);
+        registry.bind(ServerMain.rmiCallbackName, stub);
 
     }
 
@@ -60,7 +36,7 @@ public class ServerRMIManager {
         try {
             registry.unbind(ServerMain.rmiCallbackName);
         } catch (RemoteException | NotBoundException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace(System.err);
         }
 
     }

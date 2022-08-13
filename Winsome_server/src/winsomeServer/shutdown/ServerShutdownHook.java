@@ -30,17 +30,17 @@ public class ServerShutdownHook extends Thread {
     @Override
     public void run() {
 
-        stateWriter.run();
         timer.cancel();
+        stateWriter.run();
         try {
             tcpConnectionsManager.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace(System.err);
         }
         try {
             rewardsCalculator.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace(System.err);
         }
         rmiManager.unbind();
 

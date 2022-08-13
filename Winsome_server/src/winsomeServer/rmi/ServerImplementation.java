@@ -31,7 +31,7 @@ public class ServerImplementation extends RemoteObject implements ServerInterfac
 
     @Override
     public synchronized void unregisterForCallback(ClientNotificationInterface client, String username)
-            throws RemoteException{
+            throws RemoteException {
 
         clients.remove(client);
         map.remove(username, client);
@@ -45,7 +45,7 @@ public class ServerImplementation extends RemoteObject implements ServerInterfac
             try {
                 client.notify(user, flag);
             } catch (RemoteException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
     }

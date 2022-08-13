@@ -57,7 +57,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace(System.err);
                 }
                 buffer = ByteBuffer.allocate(bufferCapacity);
                 buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
@@ -70,7 +70,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace(System.err);
                 }
                 buffer.clear();
                 buffer.putInt( NetError.USERNAMEALREADYEXISTS.getCode() );
@@ -81,7 +81,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -119,7 +119,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace(System.err);
                 }
                 buffer = ByteBuffer.allocate(bufferCapacity);
                 buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
@@ -131,7 +131,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace(System.err);
                 }
                 buffer.clear();
                 buffer.putInt( NetError.USERDOESNOTEXIST.getCode() );
@@ -143,7 +143,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace(System.err);
                 }
                 buffer.clear();
                 buffer.putInt( NetError.USERALREADYLOGGEDIN.getCode() );
@@ -155,7 +155,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace(System.err);
                 }
                 buffer.clear();
                 buffer.putInt( NetError.WRONGPASSWORD.getCode() );
@@ -166,7 +166,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -194,13 +194,13 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
             try {
                 client.close();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -236,7 +236,7 @@ public enum Task implements Runnable {
                         buffer.flip();
                         client.write(buffer);
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace(System.err);
                     }
                     buffer = ByteBuffer.allocate(outcome.length());
                     buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
@@ -249,7 +249,7 @@ public enum Task implements Runnable {
                         buffer.flip();
                         client.write(buffer);
                     } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        ex.printStackTrace(System.err);
                     }
                     return;
 
@@ -262,7 +262,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace(System.err);
                 }
                 buffer.clear();
                 buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
@@ -273,7 +273,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -310,7 +310,7 @@ public enum Task implements Runnable {
                         buffer.flip();
                         client.write(buffer);
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace(System.err);
                     }
                     buffer = ByteBuffer.allocate(outcome.length());
                     buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
@@ -323,7 +323,7 @@ public enum Task implements Runnable {
                         buffer.flip();
                         client.write(buffer);
                     } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        ex.printStackTrace(System.err);
                     }
                     return;
 
@@ -336,7 +336,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace(System.err);
                 }
                 buffer.clear();
                 buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
@@ -347,7 +347,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -381,7 +381,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -414,7 +414,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -449,7 +449,7 @@ public enum Task implements Runnable {
                         buffer.flip();
                         client.write(buffer);
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace(System.err);
                     }
                     buffer = ByteBuffer.allocate(outcome.length());
                     buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
@@ -462,7 +462,7 @@ public enum Task implements Runnable {
                         buffer.flip();
                         client.write(buffer);
                     } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        ex.printStackTrace(System.err);
                     }
                     return;
 
@@ -475,7 +475,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace(System.err);
                 }
                 buffer.clear();
                 buffer.putInt( NetError.NONE.getCode() );
@@ -486,7 +486,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -518,7 +518,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -553,7 +553,7 @@ public enum Task implements Runnable {
                         buffer.flip();
                         client.write(buffer);
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace(System.err);
                     }
                     buffer = ByteBuffer.allocate(outcome.length());
                     buffer.put(outcome.getBytes(StandardCharsets.UTF_8));
@@ -566,7 +566,7 @@ public enum Task implements Runnable {
                         buffer.flip();
                         client.write(buffer);
                     } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        ex.printStackTrace(System.err);
                     }
                     return;
 
@@ -579,7 +579,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace(System.err);
                 }
                 buffer.clear();
                 buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
@@ -590,7 +590,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -620,7 +620,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace(System.err);
                 }
                 buffer = ByteBuffer.allocate(jsonPost.length());
                 buffer.put(jsonPost.getBytes(StandardCharsets.UTF_8));
@@ -633,7 +633,7 @@ public enum Task implements Runnable {
                     client.write(buffer);
                     buffer.clear();
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace(System.err);
                 }
                 buffer.putInt( NetError.POSTDOESNOTEXIST.getCode() );
 
@@ -643,7 +643,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
 
@@ -679,7 +679,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -712,7 +712,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -754,7 +754,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -791,7 +791,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -816,7 +816,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace(System.err);
                 }
                 buffer = ByteBuffer.allocate(jsonWallet.length());
                 buffer.put(jsonWallet.getBytes(StandardCharsets.UTF_8));
@@ -829,7 +829,7 @@ public enum Task implements Runnable {
                     client.write(buffer);
                     buffer.clear();
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace(System.err);
                 }
                 buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
 
@@ -839,7 +839,7 @@ public enum Task implements Runnable {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }
@@ -867,7 +867,7 @@ public enum Task implements Runnable {
                     buffer.flip();
                     client.write(buffer);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace(System.err);
                 }
                 buffer = ByteBuffer.allocate(jsonWallet.length());
                 buffer.put(jsonWallet.getBytes(StandardCharsets.UTF_8));
@@ -881,19 +881,19 @@ public enum Task implements Runnable {
                     client.write(buffer);
                     buffer.clear();
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    e.printStackTrace(System.err);
                 }
                 buffer.putInt( NetError.USERNOTYETLOGGEDIN.getCode() );
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
             try {
                 buffer.flip();
                 client.write(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
         }

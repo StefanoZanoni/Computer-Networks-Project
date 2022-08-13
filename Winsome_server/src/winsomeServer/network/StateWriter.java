@@ -35,7 +35,7 @@ public class StateWriter extends TimerTask implements Runnable {
     private final String tags_networkDirPath;
     private final String removed_IDsPath;
 
-    public StateWriter(String[] paths) {
+    public StateWriter(String[] paths) throws IOException {
 
         if (paths == null)
             throw new NullPointerException();
@@ -49,48 +49,23 @@ public class StateWriter extends TimerTask implements Runnable {
         tags_networkDirPath = paths[4];
         removed_IDsPath = paths[5];
 
-        // create directories
         Path usersDir = Paths.get(usersDirPath).toAbsolutePath();
-        try {
-            Files.createDirectories(usersDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Files.createDirectories(usersDir);
 
         Path usersNetworkDir = Paths.get(users_networkDirPath).toAbsolutePath();
-        try {
-            Files.createDirectories(usersNetworkDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Files.createDirectories(usersNetworkDir);
 
         Path postsDir = Paths.get(postsDirPath).toAbsolutePath();
-        try {
-            Files.createDirectories(postsDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Files.createDirectories(postsDir);
 
         Path postsNetworkDir = Paths.get(posts_networkDirPath).toAbsolutePath();
-        try {
-            Files.createDirectories(postsNetworkDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Files.createDirectories(postsNetworkDir);
 
         Path tagsNetworkDir = Paths.get(tags_networkDirPath).toAbsolutePath();
-        try {
-            Files.createDirectories(tagsNetworkDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Files.createDirectories(tagsNetworkDir);
 
         Path removedIDsDir = Paths.get(removed_IDsPath).toAbsolutePath();
-        try {
-            Files.createDirectories(removedIDsDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Files.createDirectories(removedIDsDir);
 
     }
 

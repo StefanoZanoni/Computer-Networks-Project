@@ -42,7 +42,7 @@ public class StateLoader {
 
     }
 
-    public void loadState() {
+    public void loadState() throws IOException {
 
         Path dirPath, filePath;
 
@@ -108,22 +108,22 @@ public class StateLoader {
 
     }
 
-    private <K, V> ConcurrentHashMap<K, V> readJsonMap(String filepath, Type mapType) {
+    private <K, V> ConcurrentHashMap<K, V> readJsonMap(String filepath, Type mapType) throws IOException {
 
         try ( Reader reader = new FileReader(filepath) ) {
             return gson.fromJson(new JsonReader(reader), mapType);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IOException(e);
         }
 
     }
 
-    private <T> ConcurrentLinkedQueue<T> readJsonQueue(String filepath, Type queueType) {
+    private <T> ConcurrentLinkedQueue<T> readJsonQueue(String filepath, Type queueType) throws IOException {
 
         try ( Reader reader = new FileReader(filepath) ) {
             return gson.fromJson(new JsonReader(reader), queueType);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IOException(e);
         }
 
     }

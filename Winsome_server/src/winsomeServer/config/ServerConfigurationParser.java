@@ -36,20 +36,10 @@ public class ServerConfigurationParser extends ConfigurationParser {
     private String tagsNetworkDirPath;
     private String removedIDsDirPath;
 
-    protected void setDefault() {
+    protected void setDefault() throws UnknownHostException {
 
-        try {
-            host = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            e.printStackTrace(System.err);
-            throw new RuntimeException("default tcp host not found");
-        }
-        try {
-            multicastIP = InetAddress.getByName("239.255.32.32");
-        } catch (UnknownHostException e) {
-            e.printStackTrace(System.err);
-            throw new RuntimeException("default multicast host not found");
-        }
+        host = InetAddress.getLocalHost();
+        multicastIP = InetAddress.getByName("239.255.32.32");
         tcpPort = 7000;
         multicastPort = 6002;
         rmiCallbackName = "FollowersServerNotification";
@@ -70,7 +60,7 @@ public class ServerConfigurationParser extends ConfigurationParser {
     }
 
     @Override
-    public void parseConfiguration() {
+    public void parseConfiguration() throws UnknownHostException {
 
         Arrays.sort(validKeys);
         Path filepath = Paths.get("Winsome_server/server.cfg").toAbsolutePath();

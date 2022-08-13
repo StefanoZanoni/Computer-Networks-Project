@@ -1,6 +1,5 @@
 package winsomeServer.tcp;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -13,31 +12,23 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ServerTCPConnectionsManager implements Closeable {
+public class ServerTCPConnectionsManager implements AutoCloseable {
 
-    private boolean end = false;
     private boolean closed = false;
     ExecutorService threadPool;
     Selector selector;
     ServerSocketChannel socketChannel;
 
-    public ServerTCPConnectionsManager(ExecutorService threadPool, InetAddress host, int port) {
+    public ServerTCPConnectionsManager(ExecutorService threadPool, InetAddress host, int port) throws IOException {
+
+        socketChannel = ServerSocketChannel.open();
+        socketChannel.configureBlocking(false);
+        socketChannel.bind(new InetSocketAddress(host, port));
+        selector = Selector.open();
+
+        socketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
         this.threadPool = threadPool;
-
-        try {
-            socketChannel = ServerSocketChannel.open();
-            socketChannel.configureBlocking(false);
-            socketChannel.bind(new InetSocketAddress(host, port));
-            selector = Selector.open();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            socketChannel.register(selector, SelectionKey.OP_ACCEPT);
-        } catch (ClosedChannelException e) {
-            throw new RuntimeException(e);
-        }
 
     }
 
@@ -45,16 +36,16 @@ public class ServerTCPConnectionsManager implements Closeable {
 
         while (true) {
 
-            // wakeup prevents the select from block and not throw
-            // ClosedSocketException if it is closed
-            if (!end)
+            // wakeup prevents the select from block and not throw ClosedSocketException if it is closed
+            if (!isClosed())
                 selector.wakeup();
-            else break;
+            else
+                break;
 
             try {
                 selector.select();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
             Set<SelectionKey> readyKeys = selector.selectedKeys();
@@ -96,7 +87,8 @@ public class ServerTCPConnectionsManager implements Closeable {
                     try {
                         key.channel().close();
                     } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        System.err.println(e.getMessage());
+                        ex.printStackTrace(System.err);
                     }
 
                 }
@@ -134,7 +126,7 @@ public class ServerTCPConnectionsManager implements Closeable {
     @Override
     public void close() throws IOException {
 
-        end = true;
+        closed = true;
 
         threadPool.shutdownNow();
         try {
@@ -166,8 +158,6 @@ public class ServerTCPConnectionsManager implements Closeable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        closed = true;
 
     }
 

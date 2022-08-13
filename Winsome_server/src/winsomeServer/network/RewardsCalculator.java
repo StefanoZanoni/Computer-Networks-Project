@@ -24,29 +24,21 @@ public class RewardsCalculator extends TimerTask implements AutoCloseable {
     private final InetSocketAddress group;
     private final NetworkInterface networkInterface;
 
-    public RewardsCalculator(float authorEarnPercentage) {
-
-        this.authorEarnPercentage = authorEarnPercentage;
+    public RewardsCalculator(float authorEarnPercentage) throws IOException {
 
         group = new InetSocketAddress(ServerMain.multicastIP, ServerMain.multicastPort);
-        try {
-            networkInterface = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-        } catch (SocketException | UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
+        networkInterface = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
 
-        try {
-            multicastSocket = new MulticastSocket(ServerMain.multicastPort);
-            multicastSocket.setReuseAddress(true);
-            multicastSocket.joinGroup(group, networkInterface);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        multicastSocket = new MulticastSocket(ServerMain.multicastPort);
+        multicastSocket.setReuseAddress(true);
+        multicastSocket.joinGroup(group, networkInterface);
 
         byte[] data;
         ByteBuffer byteBuffer = ByteBuffer.allocate(Integer.BYTES);
         data = byteBuffer.array();
         datagramPacket = new DatagramPacket(data, data.length, ServerMain.multicastIP, ServerMain.multicastPort);
+
+        this.authorEarnPercentage = authorEarnPercentage;
 
     }
 
@@ -57,7 +49,7 @@ public class RewardsCalculator extends TimerTask implements AutoCloseable {
             try {
                 multicastSocket.send(datagramPacket);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace(System.err);
             }
 
     }
@@ -114,11 +106,13 @@ public class RewardsCalculator extends TimerTask implements AutoCloseable {
     public void close() throws IOException {
 
         if (!isClosed()) {
+
+            closed = true;
+
             multicastSocket.leaveGroup(group, networkInterface);
             multicastSocket.close();
-        }
 
-        closed = true;
+        }
 
     }
 
