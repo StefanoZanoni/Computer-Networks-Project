@@ -28,7 +28,9 @@ public class ServerRMIManager {
     }
 
     public void update(String clientUsername, String user, boolean flag) {
+
         server.doCallback(clientUsername, user, flag);
+
     }
 
     public void unbind() {

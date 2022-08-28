@@ -4,6 +4,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ *  This class is used to read the commands typed on the command line.
+ *  Arguments in double or single quotes are considered single arguments.
+ *  For each command, the number of arguments is checked.
+ */
 public class CommandParser implements AutoCloseable {
 
     private boolean closed = false;
@@ -11,7 +16,7 @@ public class CommandParser implements AutoCloseable {
     private final LinkedList<String> arguments = new LinkedList<>();
     private final Scanner scanner = new Scanner(System.in);
 
-    public void parse() throws UnknownCommandException {
+    public void parse() throws UnknownCommandException, InvalidCommandException {
 
         List<String> words = new ArrayList<>();
         Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
@@ -48,32 +53,32 @@ public class CommandParser implements AutoCloseable {
 
                 case "register" -> {
                     if (words.size() < 3 || words.size() > 8)
-                        throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+                        throw new InvalidCommandException("< The number of inserted arguments is not valid");
                 }
 
                 case "post" -> {
                     if (words.size() != 3)
-                        throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+                        throw new InvalidCommandException("< The number of inserted arguments is not valid");
                     if (words.get(1).length() > 20)
-                        throw new IllegalArgumentException("< Title length is greater than 20 characters");
+                        throw new InvalidCommandException("< Title length is greater than 20 characters");
                     if (words.get(2).length() > 500)
-                        throw new IllegalArgumentException("< Content length is greater than 500 characters");
+                        throw new InvalidCommandException("< Content length is greater than 500 characters");
                 }
 
                 case "login", "comment", "rate" -> {
                     if (words.size() != 3)
-                        throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+                        throw new InvalidCommandException("< The number of inserted arguments is not valid");
                 }
 
                 case "logout", "blog", "wallet", "list users", "list following",
                         "list followers", "show feed", "wallet btc" -> {
                     if (words.size() > 1)
-                        throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+                        throw new InvalidCommandException("< The number of inserted arguments is not valid");
                 }
 
                 case "follow", "rewin", "delete", "unfollow", "show post" -> {
                     if (words.size() != 2)
-                        throw new IllegalArgumentException("< The number of inserted arguments is not valid");
+                        throw new InvalidCommandException("< The number of inserted arguments is not valid");
                 }
 
                 default -> throw new UnknownCommandException();

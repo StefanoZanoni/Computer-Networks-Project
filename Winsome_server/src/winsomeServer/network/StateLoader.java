@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * This class is used to read the server state at boot time
+ */
 public class StateLoader {
 
     private final Gson gson = new Gson();
@@ -42,6 +45,10 @@ public class StateLoader {
 
     }
 
+    /**
+     * This method retrieves the file path of each state file and for each state file creates the type
+     * of json object stored inside the latter. If the server is started for the first time, an empty state is created.
+     */
     public void loadState() throws IOException {
 
         Path dirPath, filePath;

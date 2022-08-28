@@ -5,6 +5,14 @@ import java.util.*;
 
 import static java.lang.Math.*;
 
+/**
+ *  This class represent a single post inside the Winsome social network.
+ *  It is represented by: ID, the owner, the text, the content, the number of upvotes and downvotes
+ *  and a list of comments.
+ *  The ID starts at 1000 and is assigned by the server; if a post was previously removed
+ *  then the first available removed post ID is assigned to the new post, else it is assigned incrementally.
+ *  </p>
+ */
 public final class Post {
 
     private static class Comment {
@@ -86,10 +94,12 @@ public final class Post {
     }
 
     public String toString() {
+
         return  "< Title: " + this.getTitle() + "\n"
                 + "< Content: " + this.getContent() + "\n"
                 + "< Votes: " + this.getUpvotes().size() + " positive" + ", " +  this.getDownvotes().size() + " negative\n"
                 + "< Comments: " + comments;
+
     }
 
     /**
@@ -101,7 +111,7 @@ public final class Post {
      * <p>
      * Since a user cannot upvote or downvote two times the same post and
      * upvote and downvote can only assume the value +1 and -1 respectively, the first summation
-     * inside the first log is well-defined
+     * inside the first log is well-defined.
      */
     public float computeReward(int numberOfPreviousUpvotes, int numberOfPreviousDownvotes,
                                int numberOfPreviousComments, int age) {

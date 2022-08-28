@@ -9,6 +9,9 @@ import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * This class is used to read the client configuration file
+ */
 public class ClientConfigurationParser extends ConfigurationParser {
 
     protected void setDefault() throws UnknownHostException {

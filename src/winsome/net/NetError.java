@@ -3,6 +3,10 @@ package winsome.net;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *  This enum encloses all types of errors can occur during tcp client-server communication.
+ *  Every type of error has its own showError method which is used to show to the user the error's occurred message.
+ */
 public enum NetError {
 
     NONE(0) {

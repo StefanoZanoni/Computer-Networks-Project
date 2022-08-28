@@ -12,9 +12,12 @@ import java.nio.channels.SocketChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This class is the core to manage all operations on the social network
+ */
 public class SocialNetworkManager {
 
-    // client -> user
+    // client -> username
     public static final ConcurrentHashMap<SocketChannel, String> connections = new ConcurrentHashMap<>();
 
     // username -> user: this is the list of all users in Winsome
@@ -45,7 +48,6 @@ public class SocialNetworkManager {
 
     }
 
-    //complete with json
     public static void addUser(SocketChannel client, String username, char[] password, List<String> tags)
             throws UsernameAlreadyExistsException {
 

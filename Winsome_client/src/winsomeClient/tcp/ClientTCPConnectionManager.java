@@ -22,6 +22,10 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ *  This is the communication core class. It is responsible to send the request to the server and to get the outcome.
+ *
+ */
 public class ClientTCPConnectionManager {
     SocketChannel socketChannel;
     private boolean closed;
@@ -50,12 +54,12 @@ public class ClientTCPConnectionManager {
                     case "register" -> {
                         register(arguments.get(0), arguments.get(1),
                                 arguments.subList(2, arguments.size()));
-                        receiveReferences();
+                        receiveReferrals();
                     }
 
                     case "login" -> {
                         send(command, arguments.get(0), arguments.get(1));
-                        receiveReferences();
+                        receiveReferrals();
                     }
 
                     case "post" -> {
@@ -127,6 +131,12 @@ public class ClientTCPConnectionManager {
 
     }
 
+    /**
+     * @param command the command
+     * @param arguments command arguments
+     *
+     * The request is sent as a string with the command and the respective arguments separated by |
+     */
     @SafeVarargs
     private <T> void send(String command, T... arguments) {
 
@@ -175,7 +185,10 @@ public class ClientTCPConnectionManager {
 
     }
 
-    private void receiveReferences() {
+    /**
+     * This method is used to get the referrals from the server to use the multicast and RMI services.
+     */
+    private void receiveReferrals() {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
@@ -252,7 +265,10 @@ public class ClientTCPConnectionManager {
 
     }
 
-    public void receive() {
+    /**
+     * This method is used for any request that needs to receive only the result
+     */
+    private void receive() {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
@@ -284,7 +300,7 @@ public class ClientTCPConnectionManager {
 
     }
 
-    public void receiveUsers() {
+    private void receiveUsers() {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
@@ -366,7 +382,7 @@ public class ClientTCPConnectionManager {
 
     }
 
-    public void receivePosts() {
+    private void receivePosts() {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
@@ -446,7 +462,7 @@ public class ClientTCPConnectionManager {
 
     }
 
-    public void receivePost() {
+    private void receivePost() {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
@@ -516,7 +532,7 @@ public class ClientTCPConnectionManager {
 
     }
 
-    public void receiveWallet() {
+    private void receiveWallet() {
 
         int bufferCapacity = Integer.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);

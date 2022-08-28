@@ -11,6 +11,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 
+/**
+ * This class is used to read the server configuration file
+ */
 public class ServerConfigurationParser extends ConfigurationParser {
 
     private final String[] validKeys = new String[]{ "host", "tcp_port", "multicast_IP", "multicast_port", "RMI_callback_name",

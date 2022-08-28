@@ -6,6 +6,9 @@ import winsomeClient.ClientMain;
 import java.rmi.RemoteException;
 import java.rmi.server.RemoteObject;
 
+/**
+ * This class is used by the server to notify via RMI a new follow-up or un-follow
+ */
 public class ClientNotificationImplementation extends RemoteObject implements ClientNotificationInterface {
 
     public ClientNotificationImplementation() throws RemoteException { super(); }

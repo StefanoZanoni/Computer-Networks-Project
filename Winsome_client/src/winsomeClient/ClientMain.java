@@ -1,10 +1,11 @@
 package winsomeClient;
 
 import winsomeClient.commands.CommandParser;
+import winsomeClient.commands.InvalidCommandException;
 import winsomeClient.commands.UnknownCommandException;
 import winsomeClient.config.ClientConfigurationParser;
 import winsomeClient.multicast.MulticastManager;
-import winsomeClient.rmi.ClientRMIManger;
+import winsomeClient.rmi.ClientRMIManager;
 import winsomeClient.shutdown.ClientShutdownHook;
 import winsomeClient.tcp.ClientTCPConnectionManager;
 
@@ -64,7 +65,7 @@ public class ClientMain {
 
             try {
                 commandParser.parse();
-            } catch (IllegalArgumentException e) {
+            } catch (InvalidCommandException e) {
                 System.out.println(e.getMessage());
                 System.out.print("> ");
                 error = true;
@@ -107,9 +108,9 @@ public class ClientMain {
                     System.out.println("< Operation completed successfully");
                     error = false;
 
-                    ClientRMIManger rmiManger = null;
+                    ClientRMIManager rmiManger = null;
                     try {
-                        rmiManger = new ClientRMIManger(arguments.get(0));
+                        rmiManger = new ClientRMIManager(arguments.get(0));
                     } catch (RemoteException | NotBoundException e) {
                         e.printStackTrace(System.err);
                         System.exit(-1);

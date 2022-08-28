@@ -15,6 +15,9 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * This enum encompasses each type of task a client can request
+ */
 public enum Task implements Runnable {
 
     REGISTER {
@@ -902,7 +905,14 @@ public enum Task implements Runnable {
     ;
 
     protected SocketChannel client;
+
+    /**
+     * This method is used to set the attributes in each subclass
+     *
+     * @param attributes the arguments of a client command
+     */
     public abstract void setAttributes(List<String> attributes);
+
     public void setClient(SocketChannel client) { this.client = client; }
 
 }

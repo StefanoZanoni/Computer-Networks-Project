@@ -5,6 +5,10 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ *  This class represent a wallet of a Winsome social network user.
+ *  It is represented by: the rewards and a list of all transactions.
+ */
 public final class Wallet {
 
     private static class Transaction {

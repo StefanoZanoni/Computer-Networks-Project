@@ -12,6 +12,9 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This class is the core of client communication.
+ */
 public class ServerTCPConnectionsManager implements AutoCloseable {
 
     private boolean closed = false;
@@ -32,6 +35,9 @@ public class ServerTCPConnectionsManager implements AutoCloseable {
 
     }
 
+    /**
+     * Socket multiplexing is used to read each client socket and to distribute the tasks to the thread-pool
+     */
     public void select() {
 
         while (true) {

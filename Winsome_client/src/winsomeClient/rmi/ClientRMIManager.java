@@ -10,14 +10,14 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-public class ClientRMIManger {
+public class ClientRMIManager {
 
     String username;
     Registry registry;
     ServerInterface server;
     ClientNotificationInterface stub;
 
-    public ClientRMIManger(String username) throws RemoteException, NotBoundException {
+    public ClientRMIManager(String username) throws RemoteException, NotBoundException {
 
         this.username = username;
         registry = LocateRegistry.getRegistry(ClientMain.rmiCallbackPort);

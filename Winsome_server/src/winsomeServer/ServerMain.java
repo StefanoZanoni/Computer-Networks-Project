@@ -21,7 +21,6 @@ public class ServerMain {
 
     public static InetAddress multicastIP;
     public static int multicastPort;
-
     public static String rmiCallbackName;
     public static int rmiCallbackPort;
 

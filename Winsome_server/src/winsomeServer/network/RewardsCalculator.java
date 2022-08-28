@@ -8,9 +8,14 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
+/**
+ * This class is used to calculate the rewards for each user periodically and to send the notification via multicast
+ * to all users.
+ */
 public class RewardsCalculator extends TimerTask implements AutoCloseable {
 
     private boolean closed = false;
+
     /*
         int[0] : numberOfPreviousUpvotes
         int[1] : numberOfPreviousDownvotes
@@ -18,6 +23,7 @@ public class RewardsCalculator extends TimerTask implements AutoCloseable {
         int[3] : age
     */
     private final HashMap<Post, int[]> previousStatistics = new HashMap<>();
+
     private final float authorEarnPercentage;
     private final MulticastSocket multicastSocket;
     private final DatagramPacket datagramPacket;

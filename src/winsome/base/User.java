@@ -2,6 +2,11 @@ package winsome.base;
 
 import java.util.*;
 
+/**
+ *  This class represent a single user inside the Winsome social network.
+ *  It is represented by: the username, the password, a list of user tags which are the user's preferences
+ *  and a wallet containing the rewards.
+ */
 public final class User {
 
     private final String username;
@@ -28,9 +33,11 @@ public final class User {
 
     @Override
     public String toString() {
+
         return  "< user: " + this.getUsername() + "\n" +
                 "< tags: " + this.getTags() + "\n" +
                 "< wallet: " + this.getWallet();
+
     }
 
 }

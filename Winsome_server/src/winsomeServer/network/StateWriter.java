@@ -22,6 +22,9 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * This class is used to save the server state to the file system periodically and when the server is turned off.
+ */
 public class StateWriter extends TimerTask implements Runnable {
 
     private final Gson gson = new GsonBuilder()

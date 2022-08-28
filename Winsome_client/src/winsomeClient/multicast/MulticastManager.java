@@ -5,6 +5,9 @@ import winsomeClient.ClientMain;
 import java.io.IOException;
 import java.net.*;
 
+/**
+ * This class is used to manage the multicast update of the wallet
+ */
 public class MulticastManager implements Runnable {
 
     private volatile boolean shutdown = false;
