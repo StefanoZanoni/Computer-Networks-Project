@@ -105,7 +105,6 @@ public class ClientMain {
                     Thread multicastManagerThread = new Thread(multicastManager);
                     shutdownHook.setMulticastManagerThread(multicastManagerThread);
                     multicastManagerThread.start();
-                    System.out.println("< Operation completed successfully");
                     error = false;
 
                     ClientRMIManager rmiManger = null;
@@ -122,6 +121,8 @@ public class ClientMain {
                         e.printStackTrace(System.err);
                         System.exit(-1);
                     }
+
+                    System.out.println("< Operation completed successfully");
 
                 }
 
