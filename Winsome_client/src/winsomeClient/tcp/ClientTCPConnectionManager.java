@@ -2,15 +2,16 @@ package winsomeClient.tcp;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import winsomeClient.ClientMain;
-import winsomeClient.commands.UnknownCommandException;
 import winsome.base.Post;
 import winsome.base.Wallet;
 import winsome.net.NetError;
+import winsomeClient.ClientMain;
+import winsomeClient.commands.UnknownCommandException;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
@@ -24,7 +25,6 @@ import java.util.regex.Pattern;
 
 /**
  *  This is the communication core class. It is responsible to send the request to the server and to get the outcome.
- *
  */
 public class ClientTCPConnectionManager {
     SocketChannel socketChannel;
